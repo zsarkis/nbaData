@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using nbaData;
 using nbaData.Controllers;
@@ -15,16 +16,22 @@ namespace nbaDataTests
         [SetUp]
         public void Setup()
         {
-            _ballDontLieManagerMock.Setup(players => players.GetPlayers())
-                .Returns(new List<Player> {new("Mike", "Hunt")});
-
             _controller = new PlayersController(_ballDontLieManagerMock.Object);
         }
 
         [Test]
-        public void Test1()
+        public void GetPlayers_Success_ReturnPlayers()
         {
-            var result = _controller.GetPlayers();
+            Player player = new("Mike", "Hunt");
+
+            _ballDontLieManagerMock.Setup(m => m.GetPlayers())
+                .Returns(new List<Player> {player});
+
+            List<Player> result = _controller.GetPlayers().ToList();
+
+            _ballDontLieManagerMock.Verify(m => m.GetPlayers(), Times.Once);
+            Assert.That(result.First().first_name == player.first_name);
+            Assert.That(result.First().last_name == player.last_name);
         }
 
         //

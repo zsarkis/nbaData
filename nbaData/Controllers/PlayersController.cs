@@ -18,7 +18,7 @@ namespace nbaData.Controllers
         [HttpGet]
         public IEnumerable<Player> GetPlayers()
         {
-            var players = _manager.GetPlayers();
+            IEnumerable<Player> players = _manager.GetPlayers();
 
             return players;
         }
