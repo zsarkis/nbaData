@@ -9,23 +9,24 @@ namespace nbaDataTests
 {
     public class Tests
     {
-        Mock<IBallDontLieManager> ballDontLieManagerMock = new Mock<IBallDontLieManager>();
-        private PlayersController controller;
-            
+        private readonly Mock<IBallDontLieManager> _ballDontLieManagerMock = new();
+        private PlayersController _controller;
+
         [SetUp]
         public void Setup()
         {
-            ballDontLieManagerMock.Setup(players => players.GetPlayers()).Returns(new List<Player>{new Player("Mike","Hunt")});
-            
-            controller = new PlayersController(ballDontLieManagerMock.Object);
+            _ballDontLieManagerMock.Setup(players => players.GetPlayers())
+                .Returns(new List<Player> {new("Mike", "Hunt")});
+
+            _controller = new PlayersController(_ballDontLieManagerMock.Object);
         }
 
         [Test]
         public void Test1()
         {
-            var result = controller.GetPlayers();
+            var result = _controller.GetPlayers();
         }
-        
+
         //
         // [Test]
         // public void Test2()

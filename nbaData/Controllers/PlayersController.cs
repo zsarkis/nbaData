@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using nbaData.Models;
-using Newtonsoft.Json;
-using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
 
 namespace nbaData.Controllers
 {
@@ -17,11 +14,11 @@ namespace nbaData.Controllers
         {
             _manager = manager;
         }
-        
+
         [HttpGet]
         public IEnumerable<Player> GetPlayers()
         {
-            IEnumerable<Player> players = _manager.GetPlayers();
+            var players = _manager.GetPlayers();
 
             return players;
         }

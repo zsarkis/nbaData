@@ -4,6 +4,12 @@ namespace nbaData.Models
 {
     public class Player
     {
+        public Player(string firstName, string lastName)
+        {
+            first_name = firstName;
+            last_name = lastName;
+        }
+
         public int id { get; set; }
         public string first_name { get; set; }
         public string last_name { get; set; }
@@ -13,12 +19,6 @@ namespace nbaData.Models
         public double? weight_pounds { get; set; }
 
         public Team team { get; set; }
-
-        public Player(string firstName, string lastName)
-        {
-            this.first_name = firstName;
-            this.last_name = lastName;
-        }
     }
 
     public class Team
