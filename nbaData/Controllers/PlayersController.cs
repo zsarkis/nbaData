@@ -11,27 +11,17 @@ namespace nbaData.Controllers
     [Route("api/v1/players")]
     public class PlayersController : ControllerBase
     {
+        private readonly IBallDontLieManager _manager;
+
+        public PlayersController(IBallDontLieManager manager)
+        {
+            _manager = manager;
+        }
+        
         [HttpGet]
         public IEnumerable<Player> GetPlayers()
         {
-            var players = new List<Player>();
-
-            var client = new RestClient("https://www.balldontlie.io/api/v1/players?page=0&per_page=100") {Timeout = -1};
-            client.UseNewtonsoftJson();
-            var request = new RestRequest(Method.GET);
-            var response = client.Execute(request);
-
-            var result = JsonConvert.DeserializeObject<BallDontLieResponse>(response.Content);
-            players.AddRange(result.data);
-
-            for (var x = 2; x <= result.meta.total_pages; x++)
-            {
-                var loopRequest = new RestRequest($"https://www.balldontlie.io/api/v1/players?page={x}&per_page=100");
-                var loopResponse = client.Execute(loopRequest);
-                var loopResult = JsonConvert.DeserializeObject<BallDontLieResponse>(loopResponse.Content);
-
-                players.AddRange(loopResult.data);
-            }
+            IEnumerable<Player> players = _manager.GetPlayers();
 
             return players;
         }
