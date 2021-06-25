@@ -8,6 +8,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" NoWarn="NU1605" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.1" NoWarn="NU1605" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="NunitXml.TestLogger" Version="3.0.107" />
         <PackageReference Include="RestSharp" Version="106.11.8-alpha.0.11" />
         <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.7" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
