@@ -15,7 +15,7 @@ pipeline {
  			
 	        post {
                 always {
-                    nunit testResultsPattern: 'nbaData/TestResults/*.xml'
+                    nunit testResultsPattern: 'nbaDataTests/TestResults/*.xml'
                 }
             }
 	    }
