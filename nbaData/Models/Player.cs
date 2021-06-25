@@ -4,7 +4,7 @@ namespace nbaData.Models
 {
     public class Player
     {
-        public Player(string firstName, string lastName)
+        public Player(string firstName, string lastName, Team team = null)
         {
             first_name = firstName;
             last_name = lastName;
