@@ -18,7 +18,6 @@ pipeline {
                     nunit testResultsPattern: 'nbaDataTests/TestResults/*.xml'
                     jiraSendBuildInfo site: 'nba-data.atlassian.net'
                 }
-            }
                success {
                 script {
                   println "All the tests passed."
@@ -27,6 +26,7 @@ pipeline {
               failure {
                 println "There are some failing tests."
               }
+            }
 	    }
 	}
 }
