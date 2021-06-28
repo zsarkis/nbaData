@@ -10,26 +10,25 @@ namespace nbaData
     {
         public IEnumerable<Player> GetPlayers()
         {
-            List<Player> players = new();
-
-            RestClient client = new("https://www.balldontlie.io/api/v1/players?page=0&per_page=100") {Timeout = -1};
+            List<Player> players = new List<Player>();
+            
+            RestClient client = new RestClient("https://www.balldontlie.io/api/v1/players?page=0&per_page=100") {Timeout = -1};
             client.UseNewtonsoftJson();
-            RestRequest request = new(Method.GET);
+            RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
 
             BallDontLieResponse result = JsonConvert.DeserializeObject<BallDontLieResponse>(response.Content);
             players.AddRange(result.data);
 
-            for (var x = 2; x <= result.meta.total_pages; x++)
+            for (int x = 2; x <= result.meta.total_pages; x++)
             {
-                RestRequest loopRequest = new($"https://www.balldontlie.io/api/v1/players?page={x}&per_page=100");
+                RestRequest loopRequest = new RestRequest($"https://www.balldontlie.io/api/v1/players?page={x}&per_page=100");
                 IRestResponse loopResponse = client.Execute(loopRequest);
-                BallDontLieResponse loopResult =
-                    JsonConvert.DeserializeObject<BallDontLieResponse>(loopResponse.Content);
-
+                BallDontLieResponse loopResult = JsonConvert.DeserializeObject<BallDontLieResponse>(response.Content);
+                
                 players.AddRange(loopResult.data);
             }
-
+            
             return players;
         }
     }

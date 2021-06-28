@@ -27,7 +27,8 @@ namespace nbaData.Controllers
             }
             else
             {
-                players = _manager.GetPlayers().Where(p =>
+                IEnumerable<Player> allPlayers = _manager.GetPlayers();
+                players = allPlayers.Where(p =>
                 {
                     if (p.team != null)
                     {
