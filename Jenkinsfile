@@ -21,10 +21,15 @@ pipeline {
                success {
                 script {
                   println "All the tests passed."
+                  emailext body: 'All tests are passing.', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test Results'
+
+                  //If the branch is main, then deploy
                 }
               }
               failure {
                 println "There are some failing tests."
+                emailext body: 'Build failed, please inspect jenkins console logs.', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test Results'
+
               }
             }
 	    }
