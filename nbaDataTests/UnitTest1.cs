@@ -22,7 +22,7 @@ namespace nbaDataTests
         [Test]
         public void GetPlayers_Success_ReturnPlayers()
         {
-            Player player = new("Mike", "Hunt");
+            Player player = new("Zach", "Sarkis");
 
             _ballDontLieManagerMock.Setup(m => m.GetPlayers())
                 .Returns(new List<Player> {player});

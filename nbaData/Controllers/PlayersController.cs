@@ -20,28 +20,24 @@ namespace nbaData.Controllers
         public IEnumerable<Player> GetPlayers(string teamName = null)
         {
             IEnumerable<Player> players;
-            
+
             if (string.IsNullOrEmpty(teamName))
             {
                 players = _manager.GetPlayers();
             }
             else
             {
-                IEnumerable<Player> allPlayers = _manager.GetPlayers();
-                players = allPlayers.Where(p =>
-                {
-                    if (p.team != null)
-                    {
-                        return p.team.full_name.ToLower().Contains(teamName.ToLower()) ||
-                               p.team.abbreviation.ToLower().Contains(teamName.ToLower()) ||
-                               p.team.city.ToLower().Contains(teamName.ToLower()) ||
-                               p.team.name.ToLower().Contains(teamName.ToLower());
-                    }
-
-                    return false;
-                });
+                players = _manager.GetPlayersByTeam(teamName);
+                //
+                // players = allPlayers.Where(p =>
+                // {
+                //     return p.team.full_name.ToLower().Contains(teamName.ToLower()) ||
+                //            p.team.abbreviation.ToLower().Contains(teamName.ToLower()) ||
+                //            p.team.city.ToLower().Contains(teamName.ToLower()) ||
+                //            p.team.name.ToLower().Contains(teamName.ToLower());
+                // });
             }
-            
+
             return players;
         }
     }

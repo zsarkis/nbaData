@@ -4,10 +4,15 @@ namespace nbaData.Models
 {
     public class Player
     {
-        public Player(string firstName, string lastName, Team team = null)
+        public Player(string firstName, string lastName, Team teamName = null, double? heightFeet = null, double? heightInches = null, string position = null, double? weightPounds = null)
         {
             first_name = firstName;
             last_name = lastName;
+            team = teamName;
+            height_feet = heightFeet;
+            height_inches = heightInches;
+            this.position = position;
+            weight_pounds = weightPounds;
         }
 
         public int id { get; set; }
