@@ -56,6 +56,24 @@ namespace nbaData
             
             return playersForTeam.OrderBy( p => p.last_name);
         }
+        
+        //TODO: Add short, mid, long term???
+        public IEnumerable<Player> GetShootingStats(Player player)
+        {
+            int id = player.id;
+            ShootingStats stats = new ShootingStats();
+            
+            RestClient client = new RestClient("https://www.balldontlie.io/api/v1/players?page=1&per_page=100") {Timeout = -1};
+            client.UseNewtonsoftJson();
+            RestRequest request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+
+            BallDontLieResponse result = JsonConvert.DeserializeObject<BallDontLieResponse>(response.Content);
+            stats = result.data;
+
+            return stats;
+        }
+
     }
 
     public interface IBallDontLieManager

@@ -33,9 +33,7 @@ namespace nbaData.Models
         public Team team { get; set; }
         
         public ShootingStats shootingStatsShortTerm { get; set; }
-        
         public ShootingStats shootingStatsMidTerm { get; set; }
-        
         public ShootingStats shootingStatsLongTerm { get; set; }
     }
 
