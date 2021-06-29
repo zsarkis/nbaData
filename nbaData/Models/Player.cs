@@ -4,13 +4,13 @@ namespace nbaData.Models
 {
     public class Player
     {
-        public Player(string firstName, string lastName, Team teamName = null, 
-            double? heightFeet = null, double? heightInches = null, string position = null, 
+        public Player(string firstName, string lastName, Team teamName = null,
+            double? heightFeet = null, double? heightInches = null, string position = null,
             double? weightPounds = null, int? id = null)
         {
             if (id != null)
             {
-                this.id = (int)id;
+                this.id = (int) id;
             }
 
             first_name = firstName;
@@ -31,7 +31,7 @@ namespace nbaData.Models
         public double? weight_pounds { get; set; }
 
         public Team team { get; set; }
-        
+
         public ShootingStats shootingStatsShortTerm { get; set; }
         public ShootingStats shootingStatsMidTerm { get; set; }
         public ShootingStats shootingStatsLongTerm { get; set; }
@@ -50,15 +50,39 @@ namespace nbaData.Models
 
     public class ShootingStats
     {
-        public double threePointVolume { get; set; }
-        public double threePointPercentage { get; set; }
-        public double twoPointVolume { get; set; }
-        public double twoPointPercentage { get; set; }
+        public int games_played { get; set; }
+        public int player_id { get; set; }
+        public int season { get; set; }
+        public string min { get; set; }
+        public double fgm { get; set; }
+        public double fga { get; set; }
+        public double fg3m { get; set; }
+        public double fg3a { get; set; }
+        public double ftm { get; set; }
+        public double fta { get; set; }
+        public double oreb { get; set; }
+        public double dreb { get; set; }
+        public double reb { get; set; }
+        public double ast { get; set; }
+        public double stl { get; set; }
+        public double blk { get; set; }
+        public double turnover { get; set; }
+        public double pf { get; set; }
+        public double pts { get; set; }
+        public double fg_pct { get; set; }
+        public double fg3_pct { get; set; }
+        public double ft_pct { get; set; }
     }
 
-    public class BallDontLieResponse
+    public class BallDontLiePlayerResponse
     {
         public List<Player> data { get; set; }
+        public Meta meta { get; set; }
+    }
+
+    public class BallDontLieSeasonStatsResponse
+    {
+        public List<ShootingStats> data { get; set; }
         public Meta meta { get; set; }
     }
 

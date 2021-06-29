@@ -40,5 +40,18 @@ namespace nbaData.Controllers
 
             return players;
         }
+
+        [HttpGet]
+        [Route("stats")]
+        public ShootingStats GetAverageStats(string player)
+        {
+            IEnumerable<Player> players = _manager.GetPlayers();
+
+            Player athlete = players.First(p => p.first_name == player.Split()[0] && p.last_name == player.Split()[1]);
+            
+            ShootingStats stats = _manager.GetShootingStats(athlete);
+
+            return stats;
+        }
     }
 }

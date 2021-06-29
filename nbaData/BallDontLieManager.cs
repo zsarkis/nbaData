@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using nbaData.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
@@ -18,7 +19,7 @@ namespace nbaData
             RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
 
-            BallDontLieResponse result = JsonConvert.DeserializeObject<BallDontLieResponse>(response.Content);
+            BallDontLiePlayerResponse result = JsonConvert.DeserializeObject<BallDontLiePlayerResponse>(response.Content);
             players.AddRange(result.data);
 
             for (int x = 2; x <= result.meta.total_pages; x++)
@@ -26,7 +27,7 @@ namespace nbaData
                 RestClient loopClient = new RestClient($"https://www.balldontlie.io/api/v1/players?page={x}&per_page=100") {Timeout = -1};
                 RestRequest loopRequest = new RestRequest(Method.GET);
                 IRestResponse loopResponse = loopClient.Execute(loopRequest);
-                BallDontLieResponse loopResult = JsonConvert.DeserializeObject<BallDontLieResponse>(loopResponse.Content);
+                BallDontLiePlayerResponse loopResult = JsonConvert.DeserializeObject<BallDontLiePlayerResponse>(loopResponse.Content);
                 
                 players.AddRange(loopResult.data);
             }
@@ -58,22 +59,21 @@ namespace nbaData
         }
         
         //TODO: Add short, mid, long term???
-        public IEnumerable<Player> GetShootingStats(Player player)
+        public ShootingStats GetShootingStats(Player player)
         {
             int id = player.id;
-            ShootingStats stats = new ShootingStats();
+            List<ShootingStats> stats = new List<ShootingStats>();
             
-            RestClient client = new RestClient("https://www.balldontlie.io/api/v1/players?page=1&per_page=100") {Timeout = -1};
+            RestClient client = new RestClient($"https://www.balldontlie.io/api/v1/season_averages?season=2020&player_ids[]={player.id}") {Timeout = -1};
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
 
-            BallDontLieResponse result = JsonConvert.DeserializeObject<BallDontLieResponse>(response.Content);
-            stats = result.data;
+            BallDontLieSeasonStatsResponse result = JsonConvert.DeserializeObject<BallDontLieSeasonStatsResponse>(response.Content);
+            stats.AddRange(result.data);
 
-            return stats;
+            return stats[0];
         }
-
     }
 
     public interface IBallDontLieManager
@@ -81,5 +81,7 @@ namespace nbaData
         IEnumerable<Player> GetPlayers();
         
         IEnumerable<Player> GetPlayersByTeam(string teamName);
+
+        ShootingStats GetShootingStats(Player player);
     }
 }
