@@ -59,10 +59,10 @@ namespace nbaData
         }
         
         //TODO: Add short, mid, long term???
-        public ShootingStats GetShootingStats(Player player)
+        public SeasonStats GetShootingStats(Player player)
         {
             int id = player.id;
-            List<ShootingStats> stats = new List<ShootingStats>();
+            List<SeasonStats> stats = new List<SeasonStats>();
             
             RestClient client = new RestClient($"https://www.balldontlie.io/api/v1/season_averages?season=2020&player_ids[]={player.id}") {Timeout = -1};
             client.UseNewtonsoftJson();
@@ -82,6 +82,6 @@ namespace nbaData
         
         IEnumerable<Player> GetPlayersByTeam(string teamName);
 
-        ShootingStats GetShootingStats(Player player);
+        SeasonStats GetShootingStats(Player player);
     }
 }
