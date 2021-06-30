@@ -28,30 +28,9 @@ namespace nbaData.Controllers
             else
             {
                 players = _manager.GetPlayersByTeam(teamName);
-                //
-                // players = allPlayers.Where(p =>
-                // {
-                //     return p.team.full_name.ToLower().Contains(teamName.ToLower()) ||
-                //            p.team.abbreviation.ToLower().Contains(teamName.ToLower()) ||
-                //            p.team.city.ToLower().Contains(teamName.ToLower()) ||
-                //            p.team.name.ToLower().Contains(teamName.ToLower());
-                // });
             }
 
             return players;
-        }
-
-        [HttpGet]
-        [Route("stats")]
-        public SeasonStats GetSeasonStats(string player)
-        {
-            IEnumerable<Player> players = _manager.GetPlayers();
-
-            Player athlete = players.First(p => p.first_name == player.Split()[0] && p.last_name == player.Split()[1]);
-            
-            SeasonStats stats = _manager.GetShootingStats(athlete);
-
-            return stats;
         }
     }
 }

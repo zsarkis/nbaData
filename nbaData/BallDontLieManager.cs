@@ -8,12 +8,18 @@ using RestSharp.Serializers.NewtonsoftJson;
 
 namespace nbaData
 {
+    //TODO: make these methods try
     public class BallDontLieManager : IBallDontLieManager
     {
         public IEnumerable<Player> _players = null;
 
-        public IEnumerable<Player> GetPlayers()
+        public IEnumerable<Player> GetPlayers(bool forceRun = true)
         {
+            if(!forceRun && _players != null)
+            {
+                return _players;
+            }
+            
             List<Player> players = new List<Player>();
 
             RestClient client = new RestClient("https://www.balldontlie.io/api/v1/players?page=1&per_page=100")
@@ -59,15 +65,13 @@ namespace nbaData
             return playersForTeam.OrderBy(p => p.last_name);
         }
 
-        //TODO: Add short, mid, long term???
-        public SeasonStats GetShootingStats(Player player)
+        public SeasonStats GetShootingStats(int id)
         {
-            int id = player.id;
             List<SeasonStats> stats = new List<SeasonStats>();
 
             RestClient client =
                 new RestClient(
-                        $"https://www.balldontlie.io/api/v1/season_averages?season=2020&player_ids[]={player.id}")
+                        $"https://www.balldontlie.io/api/v1/season_averages?season=2020&player_ids[]={id}")
                     {Timeout = -1};
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
@@ -79,14 +83,36 @@ namespace nbaData
 
             return stats[0];
         }
+        
+        public GameStats GetAverageGameStats(int id, int numberOfRecentGames)
+        {
+            List<GameStats> stats = new List<GameStats>();
+
+            RestClient client =
+                new RestClient(
+                        $"https://www.balldontlie.io/api/v1/stats?seasons[]=2020&player_ids[]={id}&per_page=100")
+                    {Timeout = -1};
+            client.UseNewtonsoftJson();
+            RestRequest request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+
+            BallDontLieGameStatsResponse result =
+                JsonConvert.DeserializeObject<BallDontLieGameStatsResponse>(response.Content);
+            //TODO: Sort through most recent numberOfRecentGames by game ID or date
+            stats.AddRange(result.data);
+
+            return stats[0];
+        }
     }
 
     public interface IBallDontLieManager
     {
-        IEnumerable<Player> GetPlayers();
+        IEnumerable<Player> GetPlayers(bool forceRun = true);
 
         IEnumerable<Player> GetPlayersByTeam(string teamName);
 
-        SeasonStats GetShootingStats(Player player);
+        SeasonStats GetShootingStats(int id);
+
+        GameStats GetAverageGameStats(int id, int numberOfRecentGames);
     }
 }

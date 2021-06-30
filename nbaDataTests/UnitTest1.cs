@@ -24,12 +24,12 @@ namespace nbaDataTests
         {
             Player player = new("Zach", "Sarkis");
 
-            _ballDontLieManagerMock.Setup(m => m.GetPlayers())
+            _ballDontLieManagerMock.Setup(m => m.GetPlayers(true))
                 .Returns(new List<Player> {player});
 
             List<Player> result = _controller.GetPlayers().ToList();
 
-            _ballDontLieManagerMock.Verify(m => m.GetPlayers(), Times.AtLeast(1));
+            _ballDontLieManagerMock.Verify(m => m.GetPlayers(true), Times.AtLeast(1));
             Assert.That(result.First().first_name == player.first_name);
             Assert.That(result.First().last_name == player.last_name);
         }
