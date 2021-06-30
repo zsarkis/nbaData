@@ -28,7 +28,7 @@ namespace nbaData.Models
         Team team;
         public int turnover;
     }
-
+    
     public class Game
     {
         public int id;
@@ -42,7 +42,7 @@ namespace nbaData.Models
         public string status;
 
         //TODO: verify time in a live game
-        public double time;
+        public string time;
         public int visitor_team_id;
         public int visitor_team_score;
     }

@@ -15,11 +15,11 @@ namespace nbaData
 
         public IEnumerable<Player> GetPlayers(bool forceRun = true)
         {
-            if(!forceRun && _players != null)
+            if (!forceRun && _players != null)
             {
                 return _players;
             }
-            
+
             List<Player> players = new List<Player>();
 
             RestClient client = new RestClient("https://www.balldontlie.io/api/v1/players?page=1&per_page=100")
@@ -52,14 +52,14 @@ namespace nbaData
         public IEnumerable<Player> GetPlayersByTeam(string teamName)
         {
             List<Player> players;
-            
+
             players = _players == null ? GetPlayers().ToList() : _players.ToList();
 
-            List<Player> playersForTeam = 
+            List<Player> playersForTeam =
                 players.Where(player => player.team != null)
-                    .Where(player => player.team.full_name.ToLower().Contains(teamName.ToLower()) 
-                                     || player.team.abbreviation.ToLower().Contains(teamName.ToLower()) 
-                                     || player.team.city.ToLower().Contains(teamName.ToLower()) 
+                    .Where(player => player.team.full_name.ToLower().Contains(teamName.ToLower())
+                                     || player.team.abbreviation.ToLower().Contains(teamName.ToLower())
+                                     || player.team.city.ToLower().Contains(teamName.ToLower())
                                      || player.team.name.ToLower().Contains(teamName.ToLower())).ToList();
 
             return playersForTeam.OrderBy(p => p.last_name);
@@ -83,10 +83,10 @@ namespace nbaData
 
             return stats[0];
         }
-        
-        public GameStats GetAverageGameStats(int id, int numberOfRecentGames)
+
+        public ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames)
         {
-            List<GameStats> stats = new List<GameStats>();
+            List<GameStats> allStats = new List<GameStats>();
 
             RestClient client =
                 new RestClient(
@@ -99,9 +99,35 @@ namespace nbaData
             BallDontLieGameStatsResponse result =
                 JsonConvert.DeserializeObject<BallDontLieGameStatsResponse>(response.Content);
             //TODO: Sort through most recent numberOfRecentGames by game ID or date
-            stats.AddRange(result.data);
+            allStats.AddRange(result.data);
+            
+            List<GameStats> stats = new List<GameStats>();
+            List<GameStats> statsEnumerable = allStats.OrderByDescending(stat => stat.id).ToList();
+            for (int i = 0; i < numberOfRecentGames; i++)
+            {
+                stats.Add(statsEnumerable[i]);
+            }
 
-            return stats[0];
+            ShootingGameStats finalStats = CalculateAverageShootingOverRange(stats);
+
+            return finalStats;
+        }
+
+        //TODO: determine how you want to do the averaging of the fg%
+        protected ShootingGameStats CalculateAverageShootingOverRange(List<GameStats> gameStatsList)
+        {
+            double threePointAttemptAverage = gameStatsList.Select(x => x.fg3a).DefaultIfEmpty(0).Average();
+            double twoPointAttemptAverage = gameStatsList.Select(x => x.fga - x.fg3a).DefaultIfEmpty(0).Average();
+            double threePointMadeAverage = gameStatsList.Select(x => x.fg3m).DefaultIfEmpty(0).Average();
+            double twoPointMadeAverage = gameStatsList.Select(x => x.fgm - x.fg3m).DefaultIfEmpty(0).Average();
+
+            ShootingGameStats gameStats = new ShootingGameStats();
+            gameStats.fg3m = threePointMadeAverage;
+            gameStats.fg3a = threePointAttemptAverage;
+            gameStats.fga = twoPointAttemptAverage;
+            gameStats.fgm = twoPointMadeAverage;
+
+            return gameStats;
         }
     }
 
@@ -113,6 +139,6 @@ namespace nbaData
 
         SeasonStats GetShootingStats(int id);
 
-        GameStats GetAverageGameStats(int id, int numberOfRecentGames);
+        ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames);
     }
 }
