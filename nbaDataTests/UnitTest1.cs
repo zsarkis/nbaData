@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using nbaData;
 using nbaData.Controllers;
@@ -22,90 +23,64 @@ namespace nbaDataTests
         [Test]
         public void GetPlayers_Success_ReturnPlayers()
         {
+            _ballDontLieManagerMock.Reset();
+            
             Player player = new("Zach", "Sarkis");
 
             _ballDontLieManagerMock.Setup(m => m.GetPlayers(true))
                 .Returns(new List<Player> {player});
 
-            List<Player> result = _controller.GetPlayers().ToList();
-
-            _ballDontLieManagerMock.Verify(m => m.GetPlayers(true), Times.AtLeast(1));
-            Assert.That(result.First().first_name == player.first_name);
-            Assert.That(result.First().last_name == player.last_name);
+            ObjectResult result = (ObjectResult)_controller.GetPlayers().Result;
+            List<Player> players = result.Value as List<Player>;
+            
+            _ballDontLieManagerMock.Verify(m => m.GetPlayers(true), Times.Once);
+             Assert.That(players.First().first_name == player.first_name);
+             Assert.That(players.First().last_name == player.last_name);
+             Assert.AreEqual(200, result.StatusCode);
         }
         
         [Test]
-        public void GetPlayers_WithAbbreviation_ReturnBostonPlayers()
+        public void GetPlayers_Success_ReturnPlayersFromTeam()
         {
-            // Team celtics = new Team()
-            // {
-            //     abbreviation = "BOS",
-            //     conference = "East",
-            //     division = "Atlantic"
-            // };
-            //
-            // Team nets = new Team()
-            // {
-            //     abbreviation = "BKN",
-            //     conference = "East",
-            //     division = "Atlantic"
-            // };
-            //
-            // List<Player> players = new List<Player>()
-            // {
-            //     new Player("Will", "Barton", nets),
-            //     new Player("Kyrie", "Irving", nets),
-            //     new Player("Ben", "Dover"),
-            //     new Player("Jaylen", "Brown", celtics),
-            //     new Player("Jayson", "Tatum", celtics)
-            // };
-            //
-            // _ballDontLieManagerMock.Setup(m => m.GetPlayers())
-            //     .Returns(players);
-            //
-            // List<Player> result = _controller.GetPlayers("BOS").ToList();
-            //
-            // Assert.That(result.Any());
-            // Assert.That(result.All(p => p.team == celtics));
-            Assert.That(1 == 0 + 1);
-        }
+            _ballDontLieManagerMock.Reset();
+            
+            Team joe = new Team()
+            {
+                abbreviation = "JOE",
+                conference = "East",
+                division = "Atlantic"
+            };
+            
+            Player player = new("Zach", "Sarkis", joe);
 
-        //
-        // [Test]
-        // public void Test2()
-        // {
-        //     // TODO: names might be fucked, check that
-        //     // Manually enter 5 players by name from 2 teams
-        //     List<Player> players = new List<Player>()
-        //     {
-        //         new Player("Will", "Barton"),
-        //         new Player("Gary", "Harris"),
-        //         new Player("Nikola", "Jokic"),
-        //         new Player("Paul", "Millsap"),
-        //         new Player("Jamal", "Murray"),
-        //         new Player("Jaylen", "Brown"),
-        //         new Player("Gordon", "Hayward"),
-        //         new Player("Al", "Horford"),
-        //         new Player("Kyrie", "Irving"),
-        //         new Player("Jayson", "Tatum")
-        //     };
-        //     
-        //     // Get players from balldontlie
-        //     var allPlayers = _controllerUnderTest.GetPlayers();
-        //
-        //     // Player thatGuy = new Player("George", "King");
-        //     
-        //     // var correctPlayer = allPlayers.Where(player =>
-        //     //     players.Any(guy => guy.first_name.Equals(player.first_name) && guy.last_name.Equals(player.last_name)));
-        //
-        //     List<Player> correctPlayers = 
-        //         players.Select(player => 
-        //             allPlayers.FirstOrDefault(currentPlayer => 
-        //                 currentPlayer.first_name.Equals(player.first_name) && currentPlayer.last_name.Equals(player.last_name))).ToList();
-        //
-        //     // Find ID for manually entered players
-        //     // Get season averages for those players from balldontlie
-        //     // Ship object with all 10 players over to FE
-        // }
+            _ballDontLieManagerMock.Setup(m => m.GetPlayersByTeam("JOE"))
+                .Returns(new List<Player> {player});
+
+            var result = (ObjectResult)_controller.GetPlayers("JOE").Result;
+            List<Player> players = result.Value as List<Player>;
+                
+            _ballDontLieManagerMock.Verify(m => m.GetPlayersByTeam("JOE"), Times.Once);
+            Assert.That(players.First().first_name == player.first_name);
+            Assert.That(players.First().last_name == player.last_name);
+            Assert.That(players.First().team.abbreviation == player.team.abbreviation);
+            Assert.AreEqual(200, result.StatusCode);
+        }
+        
+        [Test]
+        public void GetPlayers_Failure_ReturnPlayersFromTeam()
+        {
+            _ballDontLieManagerMock.Reset();
+            
+            Player player = new("Zach", "Sarkis");
+
+            _ballDontLieManagerMock.Setup(m => m.GetPlayersByTeam("JOE"))
+                .Returns(new List<Player>());
+
+            var result = _controller.GetPlayers("JOE").Result as NotFoundResult;
+                
+            _ballDontLieManagerMock.Verify(m => m.GetPlayersByTeam("JOE"), Times.Once);
+            
+            Assert.AreEqual(404, result.StatusCode);
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace nbaData.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Player> GetPlayers(string teamName = null)
+        public ActionResult<IEnumerable<Player>> GetPlayers(string teamName = null)
         {
             IEnumerable<Player> players;
 
@@ -30,7 +30,7 @@ namespace nbaData.Controllers
                 players = _manager.GetPlayersByTeam(teamName);
             }
 
-            return players;
+            return players.Count() > 0 ? Ok(players.ToList()) : NotFound();
         }
     }
 }
