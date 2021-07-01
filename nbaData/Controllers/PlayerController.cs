@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using nbaData.Models;
-using Newtonsoft.Json;
 
 namespace nbaData.Controllers
 {
@@ -42,7 +41,7 @@ namespace nbaData.Controllers
         {
             ShootingGameStats stats = _manager.GetAverageGameStats(playerId, numberOfRecentGames);
             
-            return stats != null ? Ok(JsonConvert.SerializeObject(stats)) : NotFound();
+            return stats != null ? Ok(stats) : NotFound();
         }
     }
 }
