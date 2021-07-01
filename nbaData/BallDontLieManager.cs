@@ -103,6 +103,7 @@ namespace nbaData
             
             List<GameStats> stats = new List<GameStats>();
             List<GameStats> statsEnumerable = allStats.OrderByDescending(stat => stat.id).ToList();
+            //TODO: verify the game is not active
             for (int i = 0; i < numberOfRecentGames; i++)
             {
                 stats.Add(statsEnumerable[i]);

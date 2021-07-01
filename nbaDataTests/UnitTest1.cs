@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using nbaData;
 using nbaData.Controllers;
@@ -11,12 +12,15 @@ namespace nbaDataTests
     public class Tests
     {
         private readonly Mock<IBallDontLieManager> _ballDontLieManagerMock = new();
-        private PlayersController _controller;
+        private readonly IBallDontLieManager _ballDontLieManager = new BallDontLieManager();
+        private PlayersController _playersController;
+        private PlayerController _playerController;
 
         [SetUp]
         public void Setup()
         {
-            _controller = new PlayersController(_ballDontLieManagerMock.Object);
+            _playersController = new PlayersController(_ballDontLieManagerMock.Object);
+            _playerController = new PlayerController(_ballDontLieManager);
         }
 
         [Test]
@@ -27,11 +31,20 @@ namespace nbaDataTests
             _ballDontLieManagerMock.Setup(m => m.GetPlayers(true))
                 .Returns(new List<Player> {player});
 
-            List<Player> result = _controller.GetPlayers().ToList();
+            List<Player> result = _playersController.GetPlayers().ToList();
 
             _ballDontLieManagerMock.Verify(m => m.GetPlayers(true), Times.AtLeast(1));
             Assert.That(result.First().first_name == player.first_name);
             Assert.That(result.First().last_name == player.last_name);
+        }
+        
+        [Test]
+        public void GetPlayers_Success_ReturnPlayer()
+        {
+            ActionResult<Player> player = _playerController.GetPlayer(434);
+
+            Assert.That(player.Value.last_name == "Tatum");
+            Assert.That(player.Value.first_name == "Jayson");
         }
         
         [Test]
