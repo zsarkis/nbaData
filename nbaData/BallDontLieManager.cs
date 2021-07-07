@@ -95,7 +95,7 @@ namespace nbaData
             BallDontLieSeasonStatsResponse result =
                 JsonConvert.DeserializeObject<BallDontLieSeasonStatsResponse>(response.Content);
             stats.AddRange(result.data);
-
+            
             return stats[0];
         }
 

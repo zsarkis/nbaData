@@ -25,7 +25,7 @@ namespace nbaDataTests
         #region Players Controller
 
         #region GetPlayers
-        
+
         [Test]
         public void GetPlayers_Success_ReturnPlayers()
         {
@@ -90,7 +90,7 @@ namespace nbaDataTests
         }
 
         #endregion GetPlayers
-        
+
         #endregion Players Controller
 
         #region Player Controller
@@ -101,7 +101,7 @@ namespace nbaDataTests
         public void GetPlayer_Success_ReturnPlayer()
         {
             _ballDontLieManagerMock.Reset();
-            
+
             Team boston = new Team()
             {
                 abbreviation = "BOS",
@@ -112,16 +112,16 @@ namespace nbaDataTests
                 city = "Boston",
                 id = 0
             };
-            
+
             Player player = new("Zach", "Sarkis", boston, 5, 9, "PG", 180, 0);
 
             _ballDontLieManagerMock.Setup(p => p.GetPlayer(0))
                 .Returns(player);
 
-            ObjectResult result = (ObjectResult)_playerController.GetPlayer(0).Result;
+            ObjectResult result = (ObjectResult) _playerController.GetPlayer(0).Result;
 
             Player resultingPlayer = result.Value as Player;
-            
+
             _ballDontLieManagerMock.Verify(m => m.GetPlayer(0), Times.Once);
             Assert.That(resultingPlayer.first_name == player.first_name);
             Assert.That(resultingPlayer.last_name == player.last_name);
@@ -138,7 +138,7 @@ namespace nbaDataTests
         public void GetPlayer_Failure_ReturnPlayer()
         {
             _ballDontLieManagerMock.Reset();
-            
+
             Team boston = new Team()
             {
                 abbreviation = "BOS",
@@ -149,7 +149,7 @@ namespace nbaDataTests
                 city = "Boston",
                 id = 0
             };
-            
+
             Team lal = new Team()
             {
                 abbreviation = "LAL",
@@ -160,7 +160,7 @@ namespace nbaDataTests
                 city = "Los Angles",
                 id = 5
             };
-            
+
             Player player = new("Zach", "Sarkis", lal, 5, 9, "PG", 180, 0);
 
             _ballDontLieManagerMock.Setup(p => p.GetPlayer(0))
@@ -169,12 +169,12 @@ namespace nbaDataTests
             var result = _playerController.GetPlayer(60).Result as NotFoundResult;
 
             _ballDontLieManagerMock.Verify(m => m.GetPlayer(60), Times.Once);
-            
+
             Assert.AreEqual(404, result.StatusCode);
         }
 
         #endregion GetPlayer
-        
+
         #region GetSeasonStats
 
         [Test]
@@ -182,7 +182,63 @@ namespace nbaDataTests
         {
             _ballDontLieManagerMock.Reset();
 
-            Assert.That(1 == 0);
+            SeasonStats stats = new SeasonStats();
+
+            stats.games_played = 65;
+            stats.player_id = 434;
+            stats.season = 2020;
+            stats.min = "35:50";
+            stats.fgm = 9.52;
+            stats.fga = 20.77;
+            stats.fg3m = 2.95;
+            stats.fg3a = 7.65;
+            stats.ftm = 4.8;
+            stats.fta = 5.49;
+            stats.oreb = 0.8;
+            stats.dreb = 6.58;
+            stats.reb = 7.38;
+            stats.ast = 4.31;
+            stats.stl = 1.17;
+            stats.blk = 0.51;
+            stats.turnover = 2.66;
+            stats.pf = 1.89;
+            stats.pts = 26.8;
+            stats.fg_pct = 0.459;
+            stats.fg3_pct = 0.386;
+            stats.ft_pct = 0.874;
+
+            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999999))
+                .Returns(stats);
+
+            var result = (ObjectResult)_playerController.GetSeasonStats(999999).Result;
+
+            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999999), Times.Once);
+
+            SeasonStats resultingStats = result.Value as SeasonStats;
+            
+            Assert.That(stats.ast == resultingStats.ast);
+            Assert.That(stats.blk == resultingStats.blk);
+            Assert.That(stats.dreb == resultingStats.dreb);
+            Assert.That(stats.fg3_pct == resultingStats.fg3_pct);
+            Assert.That(stats.fg3a == resultingStats.fg3a);
+            Assert.That(stats.fg3m == resultingStats.fg3m);
+            Assert.That(stats.fg_pct == resultingStats.fg_pct);
+            Assert.That(stats.fga == resultingStats.fga);
+            Assert.That(stats.fgm == resultingStats.fgm);
+            Assert.That(stats.ft_pct == resultingStats.ft_pct);
+            Assert.That(stats.fta == resultingStats.fta);
+            Assert.That(stats.ftm == resultingStats.ftm);
+            Assert.That(stats.games_played == resultingStats.games_played);
+            Assert.That(stats.oreb == resultingStats.oreb);
+            Assert.That(stats.pf == resultingStats.pf);
+            Assert.That(stats.player_id == resultingStats.player_id);
+            Assert.That(stats.pts == resultingStats.pts);
+            Assert.That(stats.reb == resultingStats.reb);
+            Assert.That(stats.season == resultingStats.season);
+            Assert.That(stats.stl == resultingStats.stl);
+            Assert.That(stats.turnover == resultingStats.turnover);
+            Assert.That(stats.min == resultingStats.min);
+            Assert.AreEqual(200, result.StatusCode);
         }
 
         [Test]
@@ -190,11 +246,20 @@ namespace nbaDataTests
         {
             _ballDontLieManagerMock.Reset();
 
-            Assert.That(1 == 0);
+            SeasonStats stats = new SeasonStats();
+
+            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999999))
+                .Returns(stats);
+
+            var result = _playerController.GetSeasonStats(999999).Result as NotFoundResult;
+
+            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999999), Times.Never);
+
+            Assert.AreEqual(404, result.StatusCode);
         }
 
         #endregion GetSeasonStats
-        
+
         #region GetGameAverageStats
 
         [Test]
@@ -209,12 +274,12 @@ namespace nbaDataTests
         public void GetGameAverageStats_Failure_ReturnPlayer()
         {
             _ballDontLieManagerMock.Reset();
-            
+
             Assert.That(1 == 0);
         }
 
         #endregion GetGameAverageStats
-        
+
         #endregion Player Controller
     }
 }

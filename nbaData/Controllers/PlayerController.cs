@@ -21,14 +21,20 @@ namespace nbaData.Controllers
         {
             Player player = _manager.GetPlayer(playerId);
             
-            return player != null ? Ok(player) : NotFound();
+            return player.id != 0 ? Ok(player) : NotFound();
         }
         
         [HttpGet("{playerId}/stats/seasonAverage")]
         public ActionResult<SeasonStats> GetSeasonStats(int playerId)
         {
-            IEnumerable<Player> players = _manager.GetPlayers(false);
-            
+            Player player = _manager.GetPlayer(playerId);
+
+            //TODO: Figure out how to deal with players that were not active for this season
+            if (player == null || player.id == 0)
+            {
+                return NotFound();
+            }
+
             SeasonStats stats = _manager.GetShootingStats(playerId);
             
             return stats != null ? Ok(stats) : NotFound();
