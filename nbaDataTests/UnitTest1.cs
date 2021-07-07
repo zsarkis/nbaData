@@ -113,16 +113,16 @@ namespace nbaDataTests
                 id = 0
             };
 
-            Player player = new("Zach", "Sarkis", boston, 5, 9, "PG", 180, 0);
+            Player player = new("Zach", "Sarkis", boston, 5, 9, "PG", 180, 999);
 
-            _ballDontLieManagerMock.Setup(p => p.GetPlayer(0))
+            _ballDontLieManagerMock.Setup(p => p.GetPlayer(999))
                 .Returns(player);
 
-            ObjectResult result = (ObjectResult) _playerController.GetPlayer(0).Result;
+            ObjectResult result = (ObjectResult) _playerController.GetPlayer(999).Result;
 
             Player resultingPlayer = result.Value as Player;
 
-            _ballDontLieManagerMock.Verify(m => m.GetPlayer(0), Times.Once);
+            _ballDontLieManagerMock.Verify(m => m.GetPlayer(999), Times.Once);
             Assert.That(resultingPlayer.first_name == player.first_name);
             Assert.That(resultingPlayer.last_name == player.last_name);
             Assert.That(resultingPlayer.team == player.team);
@@ -182,6 +182,22 @@ namespace nbaDataTests
         {
             _ballDontLieManagerMock.Reset();
 
+            Team boston = new Team()
+            {
+                abbreviation = "BOS",
+                conference = "East",
+                division = "Atlantic",
+                full_name = "Boston Celtics",
+                name = "Celtics",
+                city = "Boston",
+                id = 0
+            };
+
+            Player player = new("Zach", "Sarkis", boston, 5, 9, "PG", 180, 999);
+
+            _ballDontLieManagerMock.Setup(p => p.GetPlayer(999))
+                .Returns(player);
+            
             SeasonStats stats = new SeasonStats();
 
             stats.games_played = 65;
@@ -207,12 +223,12 @@ namespace nbaDataTests
             stats.fg3_pct = 0.386;
             stats.ft_pct = 0.874;
 
-            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999999))
+            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999))
                 .Returns(stats);
 
-            var result = (ObjectResult)_playerController.GetSeasonStats(999999).Result;
+            ObjectResult result = (ObjectResult)_playerController.GetSeasonStats(999).Result;
 
-            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999999), Times.Once);
+            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999), Times.Once);
 
             SeasonStats resultingStats = result.Value as SeasonStats;
             

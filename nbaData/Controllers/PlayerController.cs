@@ -21,7 +21,12 @@ namespace nbaData.Controllers
         {
             Player player = _manager.GetPlayer(playerId);
             
-            return player.id != 0 ? Ok(player) : NotFound();
+            if (player == null || player.id == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(player);
         }
         
         [HttpGet("{playerId}/stats/seasonAverage")]
