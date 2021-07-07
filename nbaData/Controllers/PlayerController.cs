@@ -19,11 +19,9 @@ namespace nbaData.Controllers
         [HttpGet("{playerId}")]
         public ActionResult<Player> GetPlayer(int playerId)
         {
-            IEnumerable<Player> players = _manager.GetPlayers(false);
+            Player player = _manager.GetPlayer(playerId);
             
-            Player athlete = players.FirstOrDefault(p => p.id == playerId);
-            
-            return athlete != null ? Ok(athlete) : NotFound();
+            return player != null ? Ok(player) : NotFound();
         }
         
         [HttpGet("{playerId}/stats/seasonAverage")]

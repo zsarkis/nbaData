@@ -49,6 +49,21 @@ namespace nbaData
             return players;
         }
 
+        public Player GetPlayer(int id)
+        {
+            RestClient client =
+                new RestClient(
+                        $"https://www.balldontlie.io/api/v1/players/{id}")
+                    {Timeout = -1};
+            client.UseNewtonsoftJson();
+            RestRequest request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+
+            Player player = JsonConvert.DeserializeObject<Player>(response.Content);
+            
+            return player;
+        }
+
         public IEnumerable<Player> GetPlayersByTeam(string teamName)
         {
             List<Player> players;
@@ -137,6 +152,8 @@ namespace nbaData
         IEnumerable<Player> GetPlayers(bool forceRun = true);
 
         IEnumerable<Player> GetPlayersByTeam(string teamName);
+
+        Player GetPlayer(int id);
 
         SeasonStats GetShootingStats(int id);
 
