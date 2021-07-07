@@ -140,8 +140,8 @@ namespace nbaData
             ShootingGameStats gameStats = new ShootingGameStats();
             gameStats.fg3m = threePointMadeAverage;
             gameStats.fg3a = threePointAttemptAverage;
-            gameStats.fga = twoPointAttemptAverage;
-            gameStats.fgm = twoPointMadeAverage;
+            gameStats.fg2a = twoPointAttemptAverage;
+            gameStats.fg2m = twoPointMadeAverage;
 
             return gameStats;
         }

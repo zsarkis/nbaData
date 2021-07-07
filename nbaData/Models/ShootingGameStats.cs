@@ -7,8 +7,8 @@ namespace nbaData.Models
         public double fg3_pct;
         public double fg3a;
         public double fg3m;
-        public double fg_pct;
-        public double fga;
-        public double fgm;
+        public double fg2_pct;
+        public double fg2a;
+        public double fg2m;
     }
 }

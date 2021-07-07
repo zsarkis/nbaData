@@ -49,6 +49,11 @@ namespace nbaData.Controllers
         public ActionResult<ShootingGameStats> GetAverageGameStats(int playerId, int numberOfRecentGames)
         {
             ShootingGameStats stats = _manager.GetAverageGameStats(playerId, numberOfRecentGames);
+
+            if (stats.fg3a == 0 && stats.fg2a == 0)
+            {
+                return NotFound();
+            }
             
             return stats != null ? Ok(stats) : NotFound();
         }
