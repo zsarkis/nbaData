@@ -23,73 +23,79 @@ namespace nbaDataTests
         }
 
         #region Players Controller
+
+        #region GetPlayers
         
         [Test]
         public void GetPlayers_Success_ReturnPlayers()
         {
             _ballDontLieManagerMock.Reset();
-            
+
             Player player = new("Zach", "Sarkis");
 
             _ballDontLieManagerMock.Setup(m => m.GetPlayers(true))
                 .Returns(new List<Player> {player});
 
-            ObjectResult result = (ObjectResult)_playersController.GetPlayers().Result;
+            ObjectResult result = (ObjectResult) _playersController.GetPlayers().Result;
             List<Player> players = result.Value as List<Player>;
-            
+
             _ballDontLieManagerMock.Verify(m => m.GetPlayers(true), Times.Once);
-             Assert.That(players.First().first_name == player.first_name);
-             Assert.That(players.First().last_name == player.last_name);
-             Assert.AreEqual(200, result.StatusCode);
+            Assert.That(players.First().first_name == player.first_name);
+            Assert.That(players.First().last_name == player.last_name);
+            Assert.AreEqual(200, result.StatusCode);
         }
-        
+
         [Test]
         public void GetPlayers_Success_ReturnPlayersFromTeam()
         {
             _ballDontLieManagerMock.Reset();
-            
+
             Team joe = new Team()
             {
                 abbreviation = "JOE",
                 conference = "East",
                 division = "Atlantic"
             };
-            
+
             Player player = new("Zach", "Sarkis", joe);
 
             _ballDontLieManagerMock.Setup(m => m.GetPlayersByTeam("JOE"))
                 .Returns(new List<Player> {player});
 
-            var result = (ObjectResult)_playersController.GetPlayers("JOE").Result;
+            var result = (ObjectResult) _playersController.GetPlayers("JOE").Result;
             List<Player> players = result.Value as List<Player>;
-                
+
             _ballDontLieManagerMock.Verify(m => m.GetPlayersByTeam("JOE"), Times.Once);
             Assert.That(players.First().first_name == player.first_name);
             Assert.That(players.First().last_name == player.last_name);
             Assert.That(players.First().team.abbreviation == player.team.abbreviation);
             Assert.AreEqual(200, result.StatusCode);
         }
-        
+
         [Test]
         public void GetPlayers_Failure_ReturnPlayersFromTeam()
         {
             _ballDontLieManagerMock.Reset();
-            
+
             Player player = new("Zach", "Sarkis");
 
             _ballDontLieManagerMock.Setup(m => m.GetPlayersByTeam("JOE"))
                 .Returns(new List<Player>());
 
             var result = _playersController.GetPlayers("JOE").Result as NotFoundResult;
-                
+
             _ballDontLieManagerMock.Verify(m => m.GetPlayersByTeam("JOE"), Times.Once);
-            
+
             Assert.AreEqual(404, result.StatusCode);
         }
 
+        #endregion GetPlayers
+        
         #endregion Players Controller
 
         #region Player Controller
+
+        #region GetPlayer
 
         [Test]
         public void GetPlayer_Success_ReturnPlayer()
@@ -167,6 +173,48 @@ namespace nbaDataTests
             Assert.AreEqual(404, result.StatusCode);
         }
 
+        #endregion GetPlayer
+        
+        #region GetSeasonStats
+
+        [Test]
+        public void GetSeasonStats_Success_ReturnPlayer()
+        {
+            _ballDontLieManagerMock.Reset();
+
+            Assert.That(1 == 0);
+        }
+
+        [Test]
+        public void GetSeasonStats_Failure_ReturnPlayer()
+        {
+            _ballDontLieManagerMock.Reset();
+
+            Assert.That(1 == 0);
+        }
+
+        #endregion GetSeasonStats
+        
+        #region GetGameAverageStats
+
+        [Test]
+        public void GetGameAverageStats_Success_ReturnPlayer()
+        {
+            _ballDontLieManagerMock.Reset();
+
+            Assert.That(1 == 0);
+        }
+
+        [Test]
+        public void GetGameAverageStats_Failure_ReturnPlayer()
+        {
+            _ballDontLieManagerMock.Reset();
+            
+            Assert.That(1 == 0);
+        }
+
+        #endregion GetGameAverageStats
+        
         #endregion Player Controller
     }
 }
