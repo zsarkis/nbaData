@@ -129,7 +129,6 @@ namespace nbaData
             return finalStats;
         }
 
-        //TODO: determine how you want to do the averaging of the fg%
         protected ShootingGameStats CalculateAverageShootingOverRange(List<GameStats> gameStatsList)
         {
             double threePointAttemptAverage = gameStatsList.Select(x => x.fg3a).DefaultIfEmpty(0).Average();
@@ -137,11 +136,19 @@ namespace nbaData
             double threePointMadeAverage = gameStatsList.Select(x => x.fg3m).DefaultIfEmpty(0).Average();
             double twoPointMadeAverage = gameStatsList.Select(x => x.fgm - x.fg3m).DefaultIfEmpty(0).Average();
 
+            double twoPointAttempts = twoPointAttemptAverage * gameStatsList.Count;
+            double twoPointMakes = twoPointMadeAverage * gameStatsList.Count;
+            
+            double threePointAttempts = threePointAttemptAverage * gameStatsList.Count;
+            double threePointMakes = threePointMadeAverage * gameStatsList.Count;
+
             ShootingGameStats gameStats = new ShootingGameStats();
             gameStats.fg3m = threePointMadeAverage;
             gameStats.fg3a = threePointAttemptAverage;
+            gameStats.fg3_pct = threePointMakes / threePointAttempts;
             gameStats.fg2a = twoPointAttemptAverage;
             gameStats.fg2m = twoPointMadeAverage;
+            gameStats.fg2_pct = twoPointMakes / twoPointAttempts;
 
             return gameStats;
         }
