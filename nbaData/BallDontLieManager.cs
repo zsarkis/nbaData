@@ -113,7 +113,6 @@ namespace nbaData
 
             BallDontLieGameStatsResponse result =
                 JsonConvert.DeserializeObject<BallDontLieGameStatsResponse>(response.Content);
-            //TODO: Sort through most recent numberOfRecentGames by game ID or date
             allStats.AddRange(result.data);
             
             List<GameStats> stats = new List<GameStats>();
