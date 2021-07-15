@@ -1,30 +1,28 @@
 import './team-select-page.css';
 import Header from './header';
-import { useEffect, useState, useMemo } from "react";
-import {BrowserRouter as Router, Switch, Route} from "react-router-dom"
+import Versus from './versus';
+import { useEffect, useState } from "react";
+import {BrowserRouter as Router} from "react-router-dom"
 import Team from './team-finding';
+import Matchup from './matchup-select';
 import axios from 'axios';
 
 function App() {
   //read useEffect docs
   //call hooks at the top level (not conditional or in loops)
   const [allTeams, setAllTeams] = useState([]);
+  //TODO: figure out if this is right to cache teams from dropdown
+  const [selectedTeams, setSelectedTeams] = useState([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
       await axios.get("https://www.balldontlie.io/api/v1/teams").then((res) => {
-        let teamList = [];
+        const teamList = [];
+        for (const team of res.data.data) {
+          teamList.push(team.full_name);
+        }
         
-        for (const team of Object.values(res.data)) {
-          teamList.push(team);
-        }
-        let full_nameTeams = [];
-
-        for (const team of Object.values(teamList[0])) {
-          full_nameTeams.push(team.full_name);
-        }
-
-        setAllTeams(full_nameTeams);
+        setAllTeams(teamList);
       });
     };
     fetchTeams();
@@ -34,7 +32,7 @@ function App() {
     <Router>
       <div className="container">
         <Header subtitle = "Providing shooting metrics by matchup" />
-        <Team allTeams={allTeams}/>
+        <Matchup allTeams={allTeams}/>
       </div>
     </Router>
   );
