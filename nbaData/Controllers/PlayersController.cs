@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using nbaData.Models;
 
@@ -7,6 +8,7 @@ namespace nbaData.Controllers
 {
     [ApiController]
     [Route("api/v1/players")]
+    [EnableCors("CorsPolicy")]
     public class PlayersController : ControllerBase
     {
         private readonly IBallDontLieManager _manager;

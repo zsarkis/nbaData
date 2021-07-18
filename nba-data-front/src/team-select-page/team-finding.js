@@ -1,5 +1,4 @@
-import {useHistory} from 'react-router-dom';
-import { Component, useState, createRef } from 'react';
+import { Component, createRef } from 'react';
 
 class Team extends Component {
   constructor(props)

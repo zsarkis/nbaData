@@ -1,18 +1,15 @@
 import './team-select-page.css';
 import Header from './header';
-import Versus from './versus';
 import { useEffect, useState } from "react";
-import {BrowserRouter as Router} from "react-router-dom"
-import Team from './team-finding';
+import {BrowserRouter as Router, Route} from "react-router-dom"
 import Matchup from './matchup-select';
+import ShooterData from '../shot-comparisons-page/shooter-data';
 import axios from 'axios';
 
 function App() {
   //read useEffect docs
   //call hooks at the top level (not conditional or in loops)
   const [allTeams, setAllTeams] = useState([]);
-  //TODO: figure out if this is right to cache teams from dropdown
-  const [selectedTeams, setSelectedTeams] = useState([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -30,10 +27,19 @@ function App() {
 
   return (
     <Router>
-      <div className="container">
-        <Header subtitle = "Providing shooting metrics by matchup" />
-        <Matchup allTeams={allTeams}/>
-      </div>
+      {/* TODO: figure out how to throw on incorrect path */}
+      <Route exact path="/">
+        <div className="container">
+          <Header subtitle = "Providing shooting metrics by matchup" />
+          <Matchup allTeams={allTeams}/>
+        </div>
+      </Route>
+      <Route path="/matchup">
+        <div className="container">
+          <Header subtitle = "Providing shooting metrics by matchup" />
+          <ShooterData></ShooterData>
+        </div>
+      </Route>
     </Router>
   );
 }

@@ -1,5 +1,5 @@
 import {useHistory} from 'react-router-dom';
-import { Component, useState, createRef } from 'react';
+import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 
 const Matchup = ({allTeams}) => {
@@ -22,7 +22,9 @@ const Matchup = ({allTeams}) => {
 
   const handleClick = (e) => {
     //redirect
-    console.log(selectedTeamA + " vs " + selectedTeamB);
+    console.log(selectedTeamA + " vs " + selectedTeamB);  
+    let path = `/matchup?teamA=${selectedTeamA}&teamB=${selectedTeamB}`; 
+    history.push(path);
   }
 
   return ( 
