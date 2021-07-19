@@ -13,6 +13,7 @@ const ShooterData = () => {
   const [rosterA, setRosterA] = useState([]);
   const [rosterB, setRosterB] = useState([]);
   const fullRoster = new Array(10);
+  const fullRosterShootingData = new Array(10);
   const [selectedRoster, setSelectedRoster] = useState([]);
 
   useEffect(() => {
@@ -43,10 +44,28 @@ const ShooterData = () => {
   //add button to search based off of contents of roster selections
   //this implementation will have a bug if the selected value doesn't change.
 
+  const acquireShootingData = async (id, iteration) => 
+  {
+    // fullRosterShootingData clear the array of shooting data
+    axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+    axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
+    await axios.get(`https://localhost:5001/api/v1/player/${id}/stats/gameAverages?numberOfRecentGames=3`).then((res) => {
+      fullRosterShootingData[iteration] = res.data;
+    });
+  }
+
   const handleClick = (e) => {
     //redirect
+    
+    let i = 0;
+    fullRoster.forEach(element => {
+      acquireShootingData(element, i++);
+    });
+
     console.log('acquiring full shooting stats...');  
   }
+
+  //#region playerChange handlers
 
   const onPlayer0Change = (e) => {
     const playerSelected = e.target.value;
@@ -98,6 +117,7 @@ const ShooterData = () => {
     fullRoster[9] = playerSelected;
   }
 
+  //#endregion
 
   return ( 
     <div className="row mt-3">
@@ -186,6 +206,11 @@ const ShooterData = () => {
     <Button onClick={handleClick}>
         Get Full Shooting Stats
       </Button>
+    </div>
+    <div className="col-md-3 mb-3">
+        <p>
+          {fullRosterShootingData[0].fg3a}
+        </p>
     </div>
   </div>
   );
