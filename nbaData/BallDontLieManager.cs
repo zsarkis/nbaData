@@ -99,6 +99,40 @@ namespace nbaData
             return stats[0];
         }
 
+        public ShootingGameStats GetAverageGameStats(int[] ids, int numberOfRecentGames)
+        {
+            List<ShootingGameStats> compiledStats = new List<ShootingGameStats>();
+            
+            foreach (int id in ids)
+            {
+                List<GameStats> allStats = new List<GameStats>();
+
+                RestClient client =
+                    new RestClient(
+                            $"https://www.balldontlie.io/api/v1/stats?seasons[]=2020&player_ids[]={id}&per_page=100")
+                        {Timeout = -1};
+                client.UseNewtonsoftJson();
+                RestRequest request = new RestRequest(Method.GET);
+                IRestResponse response = client.Execute(request);
+
+                BallDontLieGameStatsResponse result =
+                    JsonConvert.DeserializeObject<BallDontLieGameStatsResponse>(response.Content);
+                allStats.AddRange(result.data);
+            
+                List<GameStats> stats = new List<GameStats>();
+                List<GameStats> statsEnumerable = allStats.OrderByDescending(stat => stat.id).ToList();
+                //TODO: verify the game is not active
+                for (int i = 0; i < numberOfRecentGames; i++)
+                {
+                    stats.Add(statsEnumerable[i]);
+                }
+
+                compiledStats.Add(CalculateAverageShootingOverRange(stats));
+            }
+            
+            return CalculateAverageShootingOverRoster(compiledStats);
+        }
+        
         public ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames)
         {
             List<GameStats> allStats = new List<GameStats>();
@@ -151,6 +185,31 @@ namespace nbaData
 
             return gameStats;
         }
+        
+        protected ShootingGameStats CalculateAverageShootingOverRoster(List<ShootingGameStats> shootingGameStatsList)
+        {
+            double threePointAttemptSum = shootingGameStatsList.Select(x => x.fg3a).DefaultIfEmpty(0).Sum();
+            double twoPointAttemptSum = shootingGameStatsList.Select(x => x.fg2a).DefaultIfEmpty(0).Sum();
+            double threePointMadeSum = shootingGameStatsList.Select(x => x.fg3m).DefaultIfEmpty(0).Sum();
+            double twoPointMadeSum = shootingGameStatsList.Select(x => x.fg2m).DefaultIfEmpty(0).Sum();
+
+            double twoPointAttempts = twoPointAttemptSum * shootingGameStatsList.Count;
+            double twoPointMakes = twoPointMadeSum * shootingGameStatsList.Count;
+            
+            double threePointAttempts = threePointAttemptSum * shootingGameStatsList.Count;
+            double threePointMakes = threePointMadeSum * shootingGameStatsList.Count;
+
+            ShootingGameStats gameStats = new ShootingGameStats();
+            gameStats.fg3m = threePointMadeSum;
+            gameStats.fg3a = threePointAttemptSum;
+            gameStats.fg3_pct = threePointMakes / threePointAttempts;
+            gameStats.fg2a = twoPointAttemptSum;
+            gameStats.fg2m = twoPointMadeSum;
+            gameStats.fg2_pct = twoPointMakes / twoPointAttempts;
+
+            return gameStats;
+        }
+
     }
 
     public interface IBallDontLieManager
@@ -164,5 +223,7 @@ namespace nbaData
         SeasonStats GetShootingStats(int id);
 
         ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames);
+        
+        ShootingGameStats GetAverageGameStats(int[] ids, int numberOfRecentGames);
     }
 }

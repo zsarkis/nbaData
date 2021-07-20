@@ -3,6 +3,7 @@ import {useLocation} from 'react-router-dom';
 import { useEffect, useState } from "react";
 import queryString from 'query-string';
 import axios from 'axios';
+import Sunburst from 'sunburst-chart';
 
 const ShooterData = () => {
   const location = useLocation();
@@ -12,9 +13,17 @@ const ShooterData = () => {
   const teamB = params['teamB'];
   const [rosterA, setRosterA] = useState([]);
   const [rosterB, setRosterB] = useState([]);
-  const fullRoster = new Array(10);
-  const fullRosterShootingData = new Array(10);
-  const [selectedRoster, setSelectedRoster] = useState([]);
+  const [player0, setPlayer0] = useState([]);
+  const [player1, setPlayer1] = useState([]);
+  const [player2, setPlayer2] = useState([]);
+  const [player3, setPlayer3] = useState([]);
+  const [player4, setPlayer4] = useState([]);
+  const [player5, setPlayer5] = useState([]);
+  const [player6, setPlayer6] = useState([]);
+  const [player7, setPlayer7] = useState([]);
+  const [player8, setPlayer8] = useState([]);
+  const [player9, setPlayer9] = useState([]);
+  
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -44,77 +53,109 @@ const ShooterData = () => {
   //add button to search based off of contents of roster selections
   //this implementation will have a bug if the selected value doesn't change.
 
-  const acquireShootingData = async (id, iteration) => 
+  const source = axios.CancelToken.source();
+  const timeout = setTimeout(() => {
+    source.cancel();
+    // Timeout Logic
+  }, 20000);
+
+  const acquireShootingData = async () => 
   {
     // fullRosterShootingData clear the array of shooting data
     axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
     axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
-    await axios.get(`https://localhost:5001/api/v1/player/${id}/stats/gameAverages?numberOfRecentGames=3`).then((res) => {
-      fullRosterShootingData[iteration] = res.data;
+    await axios.get(`https://localhost:5001/api/v1/player/stats/gameAverages?playerIds=${player0}&playerIds=${player1}&playerIds=${player2}&playerIds=${player3}&playerIds=${player4}&playerIds=${player5}&playerIds=${player6}&playerIds=${player7}&playerIds=${player8}&playerIds=${player9}&numberOfRecentGames=3`, {cancelToken: source.token})
+    .then((res) => {
+      // setShooterData(res.data);
+      const objectPasser = res.data;
+
+      Sunburst()
+      .data(formatForChart(objectPasser))
+      .size('size')
+      .color('color')
+      .width(500)
+      .height(500)
+      .radiusScaleExponent(1)
+      (document.getElementById('chart'));
     });
+  }
+
+  const formatForChart = (shooterData) =>
+  {
+    console.log(shooterData);
+
+    var chartMaker = {
+      "name": "Shots Attempted", 
+      "color": "#84bef7", "children": [{
+          "name": "2 pointers attempted",
+          "color": "#e0b6d7",
+          "children": [{"name": "2 pointers made", "color": "#dc94cd", "size": shooterData.fg2m}, {"name": "2 pointers missed", "color": "#e6d3e2", "size": shooterData.fg2a - shooterData.fg2m}]
+      }, {
+          "name": "3 pointers attempted",
+          "color": "rgb(25 135 84 / 91%)",
+          "children": [{"name": "3 pointers made", "color": "#20b76e", "size": shooterData.fg3m}, {"name": "3 pointers missed", "color": "rgb(126 182 151)", "size": shooterData.fg3a - shooterData.fg3m}]
+      }]
+    };
+
+    return chartMaker;
   }
 
   const handleClick = (e) => {
     //redirect
-    
-    let i = 0;
-    fullRoster.forEach(element => {
-      acquireShootingData(element, i++);
-    });
-
-    console.log('acquiring full shooting stats...');  
+      acquireShootingData()
   }
 
   //#region playerChange handlers
 
+
   const onPlayer0Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[0] = playerSelected;
+    setPlayer0(playerSelected);
   }
 
   const onPlayer1Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[1] = playerSelected;
+    setPlayer1(playerSelected);
   }
 
   const onPlayer2Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[2] = playerSelected;
+    setPlayer2(playerSelected);
   }
 
   const onPlayer3Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[3] = playerSelected;
+    setPlayer3(playerSelected);
   }
 
   const onPlayer4Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[4] = playerSelected;
+    setPlayer4(playerSelected);
   }
 
   const onPlayer5Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[5] = playerSelected;
+    setPlayer5(playerSelected);
   }
 
   const onPlayer6Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[6] = playerSelected;
+    setPlayer6(playerSelected);
   }
 
   const onPlayer7Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[7] = playerSelected;
+    setPlayer7(playerSelected);
   }
 
   const onPlayer8Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[8] = playerSelected;
+    setPlayer8(playerSelected);
   }
 
   const onPlayer9Change = (e) => {
     const playerSelected = e.target.value;
-    fullRoster[9] = playerSelected;
+    setPlayer9(playerSelected);
   }
 
   //#endregion
@@ -207,11 +248,9 @@ const ShooterData = () => {
         Get Full Shooting Stats
       </Button>
     </div>
-    <div className="col-md-3 mb-3">
-        <p>
-          {fullRosterShootingData[0].fg3a}
-        </p>
-    </div>
+      <p>
+      </p>
+      <div id="chart"></div>
   </div>
   );
 }

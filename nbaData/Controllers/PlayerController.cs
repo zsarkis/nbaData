@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using nbaData.Models;
@@ -7,7 +8,7 @@ using nbaData.Models;
 namespace nbaData.Controllers
 {
     [ApiController]
-    [Route("api/v1/player")]
+    [Microsoft.AspNetCore.Mvc.Route("api/v1/player")]
     [EnableCors("CorsPolicy")]
     public class PlayerController : ControllerBase
     {
@@ -18,7 +19,7 @@ namespace nbaData.Controllers
             _manager = manager;
         }
         
-        [HttpGet("{playerId}")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("{playerId}")]
         public ActionResult<Player> GetPlayer(int playerId)
         {
             Player player = _manager.GetPlayer(playerId);
@@ -31,7 +32,7 @@ namespace nbaData.Controllers
             return Ok(player);
         }
         
-        [HttpGet("{playerId}/stats/seasonAverage")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("{playerId}/stats/seasonAverage")]
         public ActionResult<SeasonStats> GetSeasonStats(int playerId)
         {
             Player player = _manager.GetPlayer(playerId);
@@ -47,10 +48,23 @@ namespace nbaData.Controllers
             return stats != null ? Ok(stats) : NotFound();
         }
         
-        [HttpGet("{playerId}/stats/gameAverages")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("{playerId}/stats/gameAverages")]
         public ActionResult<ShootingGameStats> GetAverageGameStats(int playerId, int numberOfRecentGames)
         {
             ShootingGameStats stats = _manager.GetAverageGameStats(playerId, numberOfRecentGames);
+
+            if (stats.fg3a == 0 && stats.fg2a == 0)
+            {
+                return NotFound();
+            }
+            
+            return stats != null ? Ok(stats) : NotFound();
+        }
+        
+        [Microsoft.AspNetCore.Mvc.HttpGet("stats/gameAverages")]
+        public ActionResult<ShootingGameStats> GetAverageGameStatsMultiplePlayers([FromQuery]int[] playerIds, int numberOfRecentGames)
+        {
+            ShootingGameStats stats = _manager.GetAverageGameStats(playerIds, numberOfRecentGames);
 
             if (stats.fg3a == 0 && stats.fg2a == 0)
             {
