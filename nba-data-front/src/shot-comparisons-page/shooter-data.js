@@ -24,6 +24,7 @@ const ShooterData = () => {
   const [player8, setPlayer8] = useState([]);
   const [player9, setPlayer9] = useState([]);
   
+  
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -59,18 +60,27 @@ const ShooterData = () => {
     // Timeout Logic
   }, 20000);
 
-  const acquireShootingData = async () => 
+  const acquireShootingDataWrapped = async () => 
   {
     // fullRosterShootingData clear the array of shooting data
+    const recentGamesCount = [1, 3, 10];
+    recentGamesCount.forEach((element) =>
+    {
+      acquireShootingData(element);
+    });
+  }
+
+  const acquireShootingData = async (element) =>
+  {
     axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
     axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
-    await axios.get(`https://localhost:5001/api/v1/player/stats/gameAverages?playerIds=${player0}&playerIds=${player1}&playerIds=${player2}&playerIds=${player3}&playerIds=${player4}&playerIds=${player5}&playerIds=${player6}&playerIds=${player7}&playerIds=${player8}&playerIds=${player9}&numberOfRecentGames=3`, {cancelToken: source.token})
+    await axios.get(`https://localhost:5001/api/v1/player/stats/gameAverages?playerIds=${player0}&playerIds=${player1}&playerIds=${player2}&playerIds=${player3}&playerIds=${player4}&playerIds=${player5}&playerIds=${player6}&playerIds=${player7}&playerIds=${player8}&playerIds=${player9}&numberOfRecentGames=${element}`, {cancelToken: source.token})
     .then((res) => {
       // setShooterData(res.data);
       const objectPasser = res.data;
 
       Sunburst()
-      .data(formatForChart(objectPasser))
+      .data(formatForChart(objectPasser, element))
       .size('size')
       .color('color')
       .width(500)
@@ -79,21 +89,24 @@ const ShooterData = () => {
       (document.getElementById('chart'));
     });
   }
+  
 
-  const formatForChart = (shooterData) =>
+  const formatForChart = (shooterData, element) =>
   {
     console.log(shooterData);
 
+    const totalShots = shooterData.fg2a + shooterData.fg3a;
+
     var chartMaker = {
-      "name": "Shots Attempted", 
+      "name": `Shots Attempted: ${element} game history`, 
       "color": "#84bef7", "children": [{
-          "name": "2 pointers attempted",
+          "name": `2s attempted: ${(shooterData.fg2a / totalShots).toFixed(4) * 100}% of all shots`,
           "color": "#e0b6d7",
-          "children": [{"name": "2 pointers made", "color": "#dc94cd", "size": shooterData.fg2m}, {"name": "2 pointers missed", "color": "#e6d3e2", "size": shooterData.fg2a - shooterData.fg2m}]
+          "children": [{"name": `2s made: ${shooterData.fg2_pct.toFixed(4) * 100}% of 2s attempted and ${(shooterData.fg2m / totalShots).toFixed(2) * 100}% of all shots`, "color": "#dc94cd", "size": shooterData.fg2m}, {"name": "2s missed", "color": "#e6d3e2", "size": shooterData.fg2a - shooterData.fg2m}]
       }, {
-          "name": "3 pointers attempted",
+          "name": `3s attempted: ${(shooterData.fg3a / totalShots).toFixed(4) * 100}% of all shots`,
           "color": "rgb(25 135 84 / 91%)",
-          "children": [{"name": "3 pointers made", "color": "#20b76e", "size": shooterData.fg3m}, {"name": "3 pointers missed", "color": "rgb(126 182 151)", "size": shooterData.fg3a - shooterData.fg3m}]
+          "children": [{"name": `3s made: ${shooterData.fg3_pct.toFixed(4) * 100}% of 3s attempted and ${(shooterData.fg3m / totalShots).toFixed(2) * 100}% of all shots`, "color": "#20b76e", "size": shooterData.fg3m}, {"name": "3s missed", "color": "rgb(126 182 151)", "size": shooterData.fg3a - shooterData.fg3m}]
       }]
     };
 
@@ -101,8 +114,7 @@ const ShooterData = () => {
   }
 
   const handleClick = (e) => {
-    //redirect
-      acquireShootingData()
+    acquireShootingDataWrapped();
   }
 
   //#region playerChange handlers
