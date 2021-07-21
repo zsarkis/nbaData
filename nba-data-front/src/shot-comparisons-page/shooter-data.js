@@ -13,6 +13,7 @@ const ShooterData = () => {
   const teamB = params['teamB'];
   const [rosterA, setRosterA] = useState([]);
   const [rosterB, setRosterB] = useState([]);
+  const [rosterFull, setRosterFull] = useState([]);
   const [player0, setPlayer0] = useState([]);
   const [player1, setPlayer1] = useState([]);
   const [player2, setPlayer2] = useState([]);
@@ -23,17 +24,18 @@ const ShooterData = () => {
   const [player7, setPlayer7] = useState([]);
   const [player8, setPlayer8] = useState([]);
   const [player9, setPlayer9] = useState([]);
-  
-  
+  const [focusedPlayer, setFocusedPlayer] = useState([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
       axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+      const full = [];
       axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
       await axios.get(`https://localhost:5001/api/v1/players`, { params: {teamName: teamA}}).then((res) => {
         const roster = [];
         for (const player of res.data) {
           roster.push(player);
+          full.push(player);
         }
         
         setRosterA(roster);
@@ -42,14 +44,26 @@ const ShooterData = () => {
         const roster = [];
         for (const player of res.data) {
           roster.push(player);
+          full.push(player);
         }
         
         setRosterB(roster);
       });
+      setRosterFull(full);
     };
     fetchTeams();
   }, []);
-  
+
+  function clearChart()
+  {
+    document.getElementById("chart").innerHTML = "";
+  }
+
+  function clearIndividualChart()
+  {
+    document.getElementById("individualChart").innerHTML = "";
+  }
+
   //add all selections to a list based off of position in array
   //add button to search based off of contents of roster selections
   //this implementation will have a bug if the selected value doesn't change.
@@ -90,6 +104,35 @@ const ShooterData = () => {
     });
   }
   
+  const acquireFocusedShootingDataWrapped = async () => 
+  {
+    // fullRosterShootingData clear the array of shooting data
+    const recentGamesCount = [1, 3, 10];
+    recentGamesCount.forEach((element) =>
+    {
+      acquireFocusedShootingData(element);
+    });
+  }
+
+  const acquireFocusedShootingData = async (element) =>
+  {
+    axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+    axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
+    await axios.get(`https://localhost:5001/api/v1/player/${focusedPlayer}/stats/gameAverages?numberOfRecentGames=${element}`, {cancelToken: source.token})
+    .then((res) => {
+      // setShooterData(res.data);
+      const objectPasser = res.data;
+
+      Sunburst()
+      .data(formatForChart(objectPasser, element))
+      .size('size')
+      .color('color')
+      .width(500)
+      .height(500)
+      .radiusScaleExponent(1)
+      (document.getElementById('individualChart'));
+    });
+  }
 
   const formatForChart = (shooterData, element) =>
   {
@@ -100,9 +143,9 @@ const ShooterData = () => {
     var chartMaker = {
       "name": `Shots Attempted: ${element} game history`, 
       "color": "#84bef7", "children": [{
-          "name": `2s attempted: ${(shooterData.fg2a / totalShots).toFixed(4) * 100}% of all shots`,
+          "name": `2s attempted: ${(shooterData.fg2a / totalShots).toFixed(2) * 100}% of all shots`,
           "color": "#e0b6d7",
-          "children": [{"name": `2s made: ${shooterData.fg2_pct.toFixed(4) * 100}% of 2s attempted and ${(shooterData.fg2m / totalShots).toFixed(2) * 100}% of all shots`, "color": "#dc94cd", "size": shooterData.fg2m}, {"name": "2s missed", "color": "#e6d3e2", "size": shooterData.fg2a - shooterData.fg2m}]
+          "children": [{"name": `2s made: ${shooterData.fg2_pct.toFixed(2) * 100}% of 2s attempted and ${(shooterData.fg2m / totalShots).toFixed(2) * 100}% of all shots`, "color": "#dc94cd", "size": shooterData.fg2m}, {"name": "2s missed", "color": "#e6d3e2", "size": shooterData.fg2a - shooterData.fg2m}]
       }, {
           "name": `3s attempted: ${(shooterData.fg3a / totalShots).toFixed(4) * 100}% of all shots`,
           "color": "rgb(25 135 84 / 91%)",
@@ -113,8 +156,14 @@ const ShooterData = () => {
     return chartMaker;
   }
 
-  const handleClick = (e) => {
+  const handleAllClick = (e) => {
+    clearChart();
     acquireShootingDataWrapped();
+  }
+
+  const handleFocusClick = (e) => {
+    clearIndividualChart();
+    acquireFocusedShootingDataWrapped();
   }
 
   //#region playerChange handlers
@@ -168,6 +217,11 @@ const ShooterData = () => {
   const onPlayer9Change = (e) => {
     const playerSelected = e.target.value;
     setPlayer9(playerSelected);
+  }
+
+  const onFocusedPlayerChange = (e) => {
+    const playerSelected = e.target.value;
+    setFocusedPlayer(playerSelected);
   }
 
   //#endregion
@@ -254,15 +308,37 @@ const ShooterData = () => {
       ))}
     </select>
       <p></p>
+      <p></p>
+      Focus On
+      <p></p>
+      <select className="form-select" onChange={onFocusedPlayerChange}>
+        {rosterFull.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.first_name} {c.last_name}
+          </option>
+        ))}
+      </select>  
     </div>
     <div className="text-center">
-    <Button onClick={handleClick}>
+    <Button onClick={handleAllClick}>
         Get Full Shooting Stats
+      </Button>
+      <p></p>
+    <Button onClick={handleFocusClick}>
+        Get Focused Player Shooting Stats
       </Button>
     </div>
       <p>
       </p>
+    <div className="offset-sm-1 col-md-4">
+      Team Numbers
       <div id="chart"></div>
+    </div>
+
+    <div className="offset-sm-2 col-md-4 mb-3">
+      Individual Numbers
+      <div id="individualChart"></div>
+    </div>
   </div>
   );
 }
