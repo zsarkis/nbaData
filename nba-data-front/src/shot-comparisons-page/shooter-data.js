@@ -31,7 +31,7 @@ const ShooterData = () => {
       axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
       const full = [];
       axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
-      await axios.get(`https://localhost:5001/api/v1/players`, { params: {teamName: teamA}}).then((res) => {
+      await axios.get(`https://nbashooterdata.com:5004/api/v1/players`, { params: {teamName: teamA}}).then((res) => {
         const roster = [];
         for (const player of res.data) {
           roster.push(player);
@@ -40,7 +40,7 @@ const ShooterData = () => {
         
         setRosterA(roster);
       });
-      await axios.get(`https://localhost:5001/api/v1/players`, { params: {teamName: teamB}}).then((res) => {
+      await axios.get(`https://nbashooterdata.com:5004/api/v1/players`, { params: {teamName: teamB}}).then((res) => {
         const roster = [];
         for (const player of res.data) {
           roster.push(player);
@@ -88,7 +88,7 @@ const ShooterData = () => {
   {
     axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
     axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
-    await axios.get(`https://localhost:5001/api/v1/player/stats/gameAverages?playerIds=${player0}&playerIds=${player1}&playerIds=${player2}&playerIds=${player3}&playerIds=${player4}&playerIds=${player5}&playerIds=${player6}&playerIds=${player7}&playerIds=${player8}&playerIds=${player9}&numberOfRecentGames=${element}`, {cancelToken: source.token})
+    await axios.get(`https://nbashooterdata.com:5004/api/v1/player/stats/gameAverages?playerIds=${player0}&playerIds=${player1}&playerIds=${player2}&playerIds=${player3}&playerIds=${player4}&playerIds=${player5}&playerIds=${player6}&playerIds=${player7}&playerIds=${player8}&playerIds=${player9}&numberOfRecentGames=${element}`, {cancelToken: source.token})
     .then((res) => {
       // setShooterData(res.data);
       const objectPasser = res.data;
@@ -118,7 +118,7 @@ const ShooterData = () => {
   {
     axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
     axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
-    await axios.get(`https://localhost:5001/api/v1/player/${focusedPlayer}/stats/gameAverages?numberOfRecentGames=${element}`, {cancelToken: source.token})
+    await axios.get(`https://nbashooterdata.com:5004/api/v1/player/${focusedPlayer}/stats/gameAverages?numberOfRecentGames=${element}`, {cancelToken: source.token})
     .then((res) => {
       // setShooterData(res.data);
       const objectPasser = res.data;
