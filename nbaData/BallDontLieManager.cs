@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using nbaData.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -44,9 +45,28 @@ namespace nbaData
                 players.AddRange(loopResult.data);
             }
 
+            players = FilterPlayers(players);
+            
             _players = players;
 
             return players;
+        }
+
+        private List<Player> FilterPlayers(List<Player> players)
+        {
+            //Find last game played
+            //if over 2-3 years ago, boot it
+            List<Player> activePlayers = new List<Player>();
+            foreach (Player player in players)
+            {
+                if (GetShootingStats(player.id) != null)
+                {
+                    activePlayers.Add(player);
+                }
+                Thread.Sleep(1000);
+            }
+
+            return activePlayers;
         }
 
         public Player GetPlayer(int id)
@@ -80,13 +100,13 @@ namespace nbaData
             return playersForTeam.OrderBy(p => p.last_name);
         }
 
-        public SeasonStats GetShootingStats(int id)
+        public SeasonStats GetShootingStats(int id, int season = 2020)
         {
             List<SeasonStats> stats = new List<SeasonStats>();
 
             RestClient client =
                 new RestClient(
-                        $"https://www.balldontlie.io/api/v1/season_averages?season=2020&player_ids[]={id}")
+                        $"https://www.balldontlie.io/api/v1/season_averages?season={season}&player_ids[]={id}")
                     {Timeout = -1};
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
@@ -95,6 +115,11 @@ namespace nbaData
             BallDontLieSeasonStatsResponse result =
                 JsonConvert.DeserializeObject<BallDontLieSeasonStatsResponse>(response.Content);
             stats.AddRange(result.data);
+
+            if (stats.Count == 0)
+            {
+                return null;
+            }
             
             return stats[0];
         }
@@ -220,7 +245,7 @@ namespace nbaData
 
         Player GetPlayer(int id);
 
-        SeasonStats GetShootingStats(int id);
+        SeasonStats GetShootingStats(int id, int season = 2020);
 
         ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames);
         

@@ -223,12 +223,12 @@ namespace nbaDataTests
             stats.fg3_pct = 0.386;
             stats.ft_pct = 0.874;
 
-            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999))
+            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999, 2020))
                 .Returns(stats);
 
             ObjectResult result = (ObjectResult)_playerController.GetSeasonStats(999).Result;
 
-            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999), Times.Once);
+            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999, 2020), Times.Once);
 
             SeasonStats resultingStats = result.Value as SeasonStats;
             
@@ -264,12 +264,12 @@ namespace nbaDataTests
 
             SeasonStats stats = new SeasonStats();
 
-            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999999))
+            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999999, 2020))
                 .Returns(stats);
 
             var result = _playerController.GetSeasonStats(999999).Result as NotFoundResult;
 
-            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999999), Times.Never);
+            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999999, 2020), Times.Never);
 
             Assert.AreEqual(404, result.StatusCode);
         }
