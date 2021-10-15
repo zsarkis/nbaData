@@ -23,14 +23,12 @@ pipeline {
                   emailext body: 'All tests are passing.', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test Results'
                   //If the branch is main, then deploy
                   if (env.BRANCH_NAME == 'main') {
-                        println 'I only execute on the master branch'
-                        // sh 'dotnet publish --configuration Release'
-                        sh 'pwd'
-                        sh 'whoami'
-                        //path in concern
-                        ///var/lib/jenkins/workspace/NbaDataBuild_main
-                        sh 'sudo python /home/ubuntu/test.py'
-                        // sh 'python /home/ubuntu/deploy.py'
+                        // println 'I only execute on the master branch'
+                        sh 'dotnet publish --configuration Release'
+                        // sh 'pwd'
+                        // sh 'whoami'
+                        // sh 'sudo python /home/ubuntu/test.py'
+                        sh 'python /home/ubuntu/deploy.py'
                     }
                 }
               }
