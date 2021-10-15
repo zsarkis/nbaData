@@ -29,6 +29,8 @@ pipeline {
                         ///var/lib/jenkins/workspace/NbaDataBuild_main
                         // sh 'python /home/ubuntu/test.py'
                         sh 'sudo python /home/ubuntu/deploy.py'
+                        sh 'sudo systemctl restart kestrel-nbaData.service'
+                        sh 'curl --location --request GET \'http://localhost:5000/api/v1/players\''
                     }
                 }
               }
