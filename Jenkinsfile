@@ -26,8 +26,8 @@ pipeline {
                         println 'I only execute on the master branch'
                         // sh 'dotnet publish --configuration Release'
                         sh 'pwd'
-                        sh 'python test.py'
-                        // sh 'python deploy.py'
+                        sh 'python /home/ubuntu/test.py'
+                        // sh 'python /home/ubuntu/deploy.py'
                     }
                 }
               }
