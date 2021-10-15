@@ -25,10 +25,10 @@ pipeline {
                   if (env.BRANCH_NAME == 'main') {
                         // println 'I only execute on the master branch'
                         sh 'dotnet publish --configuration Release'
-                        // sh 'pwd'
-                        // sh 'whoami'
-                        // sh 'sudo python /home/ubuntu/test.py'
-                        sh 'python /home/ubuntu/deploy.py'
+                        //path in concern
+                        ///var/lib/jenkins/workspace/NbaDataBuild_main
+                        // sh 'python /home/ubuntu/test.py'
+                        sh 'sudo python /home/ubuntu/deploy.py'
                     }
                 }
               }
