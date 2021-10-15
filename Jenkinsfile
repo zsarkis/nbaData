@@ -28,7 +28,7 @@ pipeline {
                         sh 'pwd'
                         //path in concern
                         ///var/lib/jenkins/workspace/NbaDataBuild_main
-                        sh 'sudo python /home/ubuntu/test.py'
+                        sh 'python /home/ubuntu/test.py'
                         // sh 'python /home/ubuntu/deploy.py'
                     }
                 }
