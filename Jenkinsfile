@@ -22,6 +22,7 @@ pipeline {
                   println "All the tests passed."
                   emailext body: 'All tests are passing.', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test Results'
                   //If the branch is main, then deploy
+                  println env.BRANCH_NAME
                 }
               }
               failure {
