@@ -26,6 +26,7 @@ pipeline {
                         println 'I only execute on the master branch'
                         // sh 'dotnet publish --configuration Release'
                         sh 'pwd'
+                        sh 'whoami'
                         //path in concern
                         ///var/lib/jenkins/workspace/NbaDataBuild_main
                         sh 'python /home/ubuntu/test.py'
