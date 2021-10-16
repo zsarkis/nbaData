@@ -33,6 +33,7 @@ pipeline {
                         sh 'sudo python /home/ubuntu/deployFront.py'
                         sh 'sudo chmod -R 777 /var/www/nba-data-front/'
                         sh 'sudo chown -R $(whoami) /usr/local/lib/node_modules/'
+                        sh 'sudo chown -R $(whoami) /var/www/nba-data-front/node_modules'
                         sh 'sudo chmod -R 775 /usr/local/lib/node_modules/'
                         sleep(1)
 
