@@ -34,7 +34,11 @@ pipeline {
                         sh 'sudo npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ install react-scripts --save'
                         sh 'sudo chmod  -R 777 /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/'
                         sh 'sudo npm install node-sass --save'
-                        sh 'npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ run build'
+                        sleep(1)
+                        dir("folder")
+                        {
+                          sh 'npm run build'
+                        }
                         sh 'sudo python /home/ubuntu/deployFront.py'
                         sh 'sudo systemctl restart nginx'
 
