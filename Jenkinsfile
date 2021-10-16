@@ -33,14 +33,14 @@ pipeline {
                         sh 'sudo python /home/ubuntu/deployFront.py'
                         sh 'sudo chmod -R 777 /var/www/nba-data-front/'
                         sh 'sudo chown -R $(whoami) /usr/local/lib/node_modules/'
-                        sh 'sudo chown -R $(whoami) /var/www/nba-data-front/node_modules'
+                        // sh 'sudo chown -R $(whoami) /var/www/nba-data-front/node_modules'
                         sh 'sudo chmod -R 775 /usr/local/lib/node_modules/'
                         sleep(1)
 
                         dir("/var/www/nba-data-front")
                         {
-                          sh 'sudo npm install --save'
-                          sh 'sudo npm install react-scripts --save'
+                          // sh 'sudo npm install --save'
+                          // sh 'sudo npm install react-scripts --save'
                           // sh 'sudo npm install node-sass --save'
                           // sh 'npm run build'
                         }
@@ -49,7 +49,7 @@ pipeline {
                         sh 'cat ~/snippets/finishFrontEndDeploy.txt'
                         
                         sleep(10)
-                        // sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
+                        sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
                     }
                 }
               }
