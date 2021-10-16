@@ -46,7 +46,7 @@ pipeline {
                         }
                         // sh 'sudo systemctl restart nginx'
                         println "Need to add back the actual \"Build and Deploy\" steps later. Sick of fighting with the jenkins user."
-                        sh 'cat ~/snippets/finishFrontEndDeploy.txt'
+                        sh 'cat /home/ubuntu/snippets/finishFrontEndDeploy.txt'
                         
                         sleep(10)
                         sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
