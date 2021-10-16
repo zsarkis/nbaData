@@ -37,7 +37,7 @@ pipeline {
                         sh 'sudo chown -R $(whoami) /usr/local/lib/node_modules/'
                         sh 'sudo chmod -R 775 /usr/local/lib/node_modules/'
                         sleep(1)
-                        dir("folder")
+                        dir("nba-data-front")
                         {
                           sh 'npm run build'
                         }
