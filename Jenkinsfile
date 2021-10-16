@@ -30,15 +30,16 @@ pipeline {
 
 
 
-                        sh 'sudo npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ install --save'
-                        sh 'sudo npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ install react-scripts --save'
-                        sh 'sudo chmod  -R 777 /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/'
-                        // sh 'sudo npm install node-sass --save'
+                        sh 'sudo chmod -R 777 /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/'
                         sh 'sudo chown -R $(whoami) /usr/local/lib/node_modules/'
                         sh 'sudo chmod -R 775 /usr/local/lib/node_modules/'
                         sleep(1)
+
                         dir("nba-data-front")
                         {
+                          sh 'sudo npm install --save'
+                          sh 'sudo npm install react-scripts --save'
+                          // sh 'sudo npm install node-sass --save'
                           sh 'npm run build'
                         }
                         sh 'sudo python /home/ubuntu/deployFront.py'
