@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using nbaData.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
@@ -24,7 +23,7 @@ namespace nbaData
             List<Player> players = new List<Player>();
 
             RestClient client = new RestClient("https://www.balldontlie.io/api/v1/players?page=1&per_page=100")
-                {Timeout = -1};
+                { Timeout = -1 };
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
@@ -36,7 +35,7 @@ namespace nbaData
             for (int x = 2; x <= result.meta.total_pages; x++)
             {
                 RestClient loopClient =
-                    new RestClient($"https://www.balldontlie.io/api/v1/players?page={x}&per_page=100") {Timeout = -1};
+                    new($"https://www.balldontlie.io/api/v1/players?page={x}&per_page=100") { Timeout = -1 };
                 RestRequest loopRequest = new RestRequest(Method.GET);
                 IRestResponse loopResponse = loopClient.Execute(loopRequest);
                 BallDontLiePlayerResponse loopResult =
@@ -46,27 +45,10 @@ namespace nbaData
             }
 
             players = FilterPlayers(players);
-            
+
             _players = players;
 
             return players;
-        }
-
-        private List<Player> FilterPlayers(List<Player> players)
-        {
-            //Find last game played
-            //if over 2-3 years ago, boot it
-            List<Player> activePlayers = new List<Player>();
-            foreach (Player player in players)
-            {
-                if (GetShootingStats(player.id) != null)
-                {
-                    activePlayers.Add(player);
-                }
-                Thread.Sleep(1000);
-            }
-
-            return activePlayers;
         }
 
         public Player GetPlayer(int id)
@@ -74,13 +56,13 @@ namespace nbaData
             RestClient client =
                 new RestClient(
                         $"https://www.balldontlie.io/api/v1/players/{id}")
-                    {Timeout = -1};
+                    { Timeout = -1 };
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
 
             Player player = JsonConvert.DeserializeObject<Player>(response.Content);
-            
+
             return player;
         }
 
@@ -100,14 +82,14 @@ namespace nbaData
             return playersForTeam.OrderBy(p => p.last_name);
         }
 
-        public SeasonStats GetShootingStats(int id, int season = 2020)
+        public SeasonStats GetShootingStats(int id, int season = 2021)
         {
             List<SeasonStats> stats = new List<SeasonStats>();
 
             RestClient client =
                 new RestClient(
                         $"https://www.balldontlie.io/api/v1/season_averages?season={season}&player_ids[]={id}")
-                    {Timeout = -1};
+                    { Timeout = -1 };
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
@@ -120,22 +102,22 @@ namespace nbaData
             {
                 return null;
             }
-            
+
             return stats[0];
         }
 
         public ShootingGameStats GetAverageGameStats(int[] ids, int numberOfRecentGames)
         {
             List<ShootingGameStats> compiledStats = new List<ShootingGameStats>();
-            
+
             foreach (int id in ids)
             {
                 List<GameStats> allStats = new List<GameStats>();
 
                 RestClient client =
                     new RestClient(
-                            $"https://www.balldontlie.io/api/v1/stats?seasons[]=2020&player_ids[]={id}&per_page=100")
-                        {Timeout = -1};
+                            $"https://www.balldontlie.io/api/v1/stats?seasons[]=2021&player_ids[]={id}&per_page=100")
+                        { Timeout = -1 };
                 client.UseNewtonsoftJson();
                 RestRequest request = new RestRequest(Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -143,7 +125,7 @@ namespace nbaData
                 BallDontLieGameStatsResponse result =
                     JsonConvert.DeserializeObject<BallDontLieGameStatsResponse>(response.Content);
                 allStats.AddRange(result.data);
-            
+
                 List<GameStats> stats = new List<GameStats>();
                 List<GameStats> statsEnumerable = allStats.OrderByDescending(stat => stat.id).ToList();
                 //TODO: verify the game is not active
@@ -154,18 +136,18 @@ namespace nbaData
 
                 compiledStats.Add(CalculateAverageShootingOverRange(stats));
             }
-            
+
             return CalculateAverageShootingOverRoster(compiledStats);
         }
-        
+
         public ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames)
         {
             List<GameStats> allStats = new List<GameStats>();
 
             RestClient client =
                 new RestClient(
-                        $"https://www.balldontlie.io/api/v1/stats?seasons[]=2020&player_ids[]={id}&per_page=100")
-                    {Timeout = -1};
+                        $"https://www.balldontlie.io/api/v1/stats?seasons[]=2021&player_ids[]={id}&per_page=100")
+                    { Timeout = -1 };
             client.UseNewtonsoftJson();
             RestRequest request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
@@ -173,7 +155,7 @@ namespace nbaData
             BallDontLieGameStatsResponse result =
                 JsonConvert.DeserializeObject<BallDontLieGameStatsResponse>(response.Content);
             allStats.AddRange(result.data);
-            
+
             List<GameStats> stats = new List<GameStats>();
             List<GameStats> statsEnumerable = allStats.OrderByDescending(stat => stat.id).ToList();
             //TODO: verify the game is not active
@@ -187,6 +169,21 @@ namespace nbaData
             return finalStats;
         }
 
+        private List<Player> FilterPlayers(List<Player> players)
+        {
+            //Find last game played
+            //if over 2-3 years ago, boot it
+            List<Player> activePlayers = new();
+            foreach (Player player in players)
+            {
+                if (GetShootingStats(player.id) != null) activePlayers.Add(player);
+
+                Thread.Sleep(1000);
+            }
+
+            return activePlayers;
+        }
+
         protected ShootingGameStats CalculateAverageShootingOverRange(List<GameStats> gameStatsList)
         {
             double threePointAttemptAverage = gameStatsList.Select(x => x.fg3a).DefaultIfEmpty(0).Average();
@@ -196,7 +193,7 @@ namespace nbaData
 
             double twoPointAttempts = twoPointAttemptAverage * gameStatsList.Count;
             double twoPointMakes = twoPointMadeAverage * gameStatsList.Count;
-            
+
             double threePointAttempts = threePointAttemptAverage * gameStatsList.Count;
             double threePointMakes = threePointMadeAverage * gameStatsList.Count;
 
@@ -210,7 +207,7 @@ namespace nbaData
 
             return gameStats;
         }
-        
+
         protected ShootingGameStats CalculateAverageShootingOverRoster(List<ShootingGameStats> shootingGameStatsList)
         {
             double threePointAttemptSum = shootingGameStatsList.Select(x => x.fg3a).DefaultIfEmpty(0).Sum();
@@ -220,7 +217,7 @@ namespace nbaData
 
             double twoPointAttempts = twoPointAttemptSum * shootingGameStatsList.Count;
             double twoPointMakes = twoPointMadeSum * shootingGameStatsList.Count;
-            
+
             double threePointAttempts = threePointAttemptSum * shootingGameStatsList.Count;
             double threePointMakes = threePointMadeSum * shootingGameStatsList.Count;
 
@@ -234,7 +231,6 @@ namespace nbaData
 
             return gameStats;
         }
-
     }
 
     public interface IBallDontLieManager
@@ -245,10 +241,10 @@ namespace nbaData
 
         Player GetPlayer(int id);
 
-        SeasonStats GetShootingStats(int id, int season = 2020);
+        SeasonStats GetShootingStats(int id, int season = 2021);
 
         ShootingGameStats GetAverageGameStats(int id, int numberOfRecentGames);
-        
+
         ShootingGameStats GetAverageGameStats(int[] ids, int numberOfRecentGames);
     }
 }
