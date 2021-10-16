@@ -30,10 +30,10 @@ pipeline {
 
 
 
-                        sh 'sudo npm install --save'
-                        sh 'sudo npm install react-scripts --save'
+                        sh 'sudo npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ install --save'
+                        sh 'sudo npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ install react-scripts --save'
                         sh 'sudo chmod  -R 777 /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/'
-                        sh 'npm run build'
+                        sh 'npm --prefix /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/ run build'
                         sh 'sudo python /home/ubuntu/deployFront.py'
                         sh 'sudo systemctl restart nginx'
 
