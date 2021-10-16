@@ -30,7 +30,7 @@ function App() {
       {/* TODO: figure out how to throw on incorrect path */}
       <Route exact path="/">
         <div className="container">
-          <Header subtitle = "Providing shooting metrics by matchup TEST" />
+          <Header subtitle = "Providing shooting metrics by matchup" />
           <Matchup allTeams={allTeams}/>
         </div>
       </Route>
