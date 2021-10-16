@@ -29,23 +29,24 @@ pipeline {
                         sh 'sudo systemctl restart kestrel-nbaData.service'
 
 
-
                         sh 'sudo chmod -R 777 /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/'
+                        sh 'sudo python /home/ubuntu/deployFront.py'
+                        sh 'sudo chmod -R 777 /var/www/nba-data-front/'
                         sh 'sudo chown -R $(whoami) /usr/local/lib/node_modules/'
                         sh 'sudo chmod -R 775 /usr/local/lib/node_modules/'
                         sleep(1)
 
-                        dir("nba-data-front")
+                        dir("/var/www/nba-data-front")
                         {
                           sh 'sudo npm install --save'
                           sh 'sudo npm install react-scripts --save'
                           // sh 'sudo npm install node-sass --save'
                           // sh 'npm run build'
                         }
-                        sh 'sudo python /home/ubuntu/deployFront.py'
                         // sh 'sudo systemctl restart nginx'
                         println "Need to add back the actual \"Build and Deploy\" steps later. Sick of fighting with the jenkins user."
-
+                        sh 'cat ~/snippets/finishFrontEndDeploy.txt'
+                        
                         sleep(10)
                         // sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
                     }
