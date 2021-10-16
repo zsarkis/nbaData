@@ -40,10 +40,11 @@ pipeline {
                           sh 'sudo npm install --save'
                           sh 'sudo npm install react-scripts --save'
                           // sh 'sudo npm install node-sass --save'
-                          sh 'npm run build'
+                          // sh 'npm run build'
                         }
                         sh 'sudo python /home/ubuntu/deployFront.py'
-                        sh 'sudo systemctl restart nginx'
+                        // sh 'sudo systemctl restart nginx'
+                        println "Need to add back the actual \"Build and Deploy\" steps later. Sick of fighting with the jenkins user."
 
                         sleep(10)
                         // sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
