@@ -25,14 +25,20 @@ pipeline {
                   if (env.BRANCH_NAME == 'main') {
                         // println 'I only execute on the master branch'
                         sh 'dotnet publish --configuration Release'
-                        //path in concern
-                        ///var/lib/jenkins/workspace/NbaDataBuild_main
-                        // sh 'python /home/ubuntu/test.py'
-                        sh 'sudo python /home/ubuntu/deploy.py'
+                        sh 'sudo python /home/ubuntu/deployBack.py'
                         sh 'sudo systemctl restart kestrel-nbaData.service'
 
+
+
+                        sh 'sudo npm install --save'
+                        sh 'sudo npm install react-scripts --save'
+                        sh 'sudo chmod  -R 777 /var/lib/jenkins/workspace/NbaDataBuild_main/nba-data-front/'
+                        sh 'npm run build'
+                        sh 'sudo python /home/ubuntu/deployFront.py'
+                        sh 'sudo systemctl restart nginx'
+
                         sleep(10)
-                        sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
+                        // sh 'curl --keepalive-time 500000 --location --request GET \'http://localhost:5000/api/v1/players\''
                     }
                 }
               }
