@@ -223,12 +223,12 @@ namespace nbaDataTests
             stats.fg3_pct = 0.386;
             stats.ft_pct = 0.874;
 
-            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999, 2020))
+            _ballDontLieManagerMock.Setup(p => p.GetShootingStats(999, 2021))
                 .Returns(stats);
 
             ObjectResult result = (ObjectResult)_playerController.GetSeasonStats(999).Result;
 
-            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999, 2020), Times.Once);
+            _ballDontLieManagerMock.Verify(m => m.GetShootingStats(999, 2021), Times.Once);
 
             SeasonStats resultingStats = result.Value as SeasonStats;
             
